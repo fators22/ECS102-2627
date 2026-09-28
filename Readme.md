@@ -1,4 +1,4 @@
-# ECS 102: Introduction to Computing 🚀
+# ECS 102: Introduction to Computing -SUPA Credit
 
 Welcome to my repository for **ECS 102: Introduction to Computing**. This repository houses all my coursework, laboratory projects, and final applications developed using **Java** and **VS Code**. 
 
