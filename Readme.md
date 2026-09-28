@@ -6,7 +6,7 @@ The curriculum transitions from foundational software architecture to data struc
 
 ---
 
-## 🛠️ Tech Stack & Environment
+## Tech Stack & Environment
 
 * **Language:** **Java** (JDK 17+)
 * **IDE:** **Visual Studio Code (VS Code)**
@@ -16,24 +16,24 @@ The curriculum transitions from foundational software architecture to data struc
 
 ---
 
-## 📅 Curriculum Overview & Units
+## Curriculum Overview & Units
 
-### 🟢 Part 1: Core Fundamentals & OOP
+###  Part 1: Core Fundamentals & OOP
 * **Unit 1: Java Syntax & Primitive Types** – Variables, data types, arithmetic expressions, and console I/O.
 * **Unit 2: Using Objects with Greenfoot & Class Design** – Object-oriented principles, visual simulations, state, behavior, and custom classes.
 * **Unit 3: Algorithms with Conditionals, Loops & File I/O** – Boolean logic, loops (`for`, `while`), data streams, and parsing files.
 
-### 🟡 Part 2: Linear Data Structures & Logic
+### Part 2: Linear Data Structures & Logic
 * **Unit 4: ArrayLists & String Methods** – Dynamic arrays, text manipulation, and sequential data handling.
 * **Unit 5: Inheritance & Polymorphism** – Class hierarchies, overriding, abstract classes, and interfaces.
 * **Unit 6: Multidimensional Arrays & Algorithms** – Matrix manipulation, grid-based logic, and nested loop traversal.
 
-### 🔴 Part 3: Advanced Structures & Full-Stack Development
+### Part 3: Advanced Structures & Full-Stack Development
 * **Unit 7: Linked Lists, Stacks & Queues** – Custom reference-based structures, FIFO/LIFO abstract data types.
 * **Unit 8: Recursion, Searching & Sorting** – Divide-and-conquer logic, binary search, and classic sorting algorithms (Merge, Quick, Selection, Insertion).
 * **Unit 9: Full-Stack Application Development with Spring Boot & Databases** – Building REST APIs, Model-View-Controller (MVC) architecture, and database persistence.
 
-## 🚀 Getting Started locally
+##Getting Started locally
 
 ### Prerequisites
 * Ensure you have the **Java Extension Pack** installed in VS Code.
@@ -50,7 +50,7 @@ The curriculum transitions from foundational software architecture to data struc
 ### Run Instructions (Unit 9 Spring Boot Application)
 1. Navigate to the app directory:
    ```bash
-   cd Unit09_SpringBootApp
+   cd Unit9_SpringBootApp
    ```
 2. Run the application using the Maven wrapper:
    ```bash
