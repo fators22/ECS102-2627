@@ -3,136 +3,174 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Static vs Instance — Objects &amp; Methods Drills</title>
-<!--
-  OBJECTS & METHODS DRILLS (Java). Open in any browser - iPad Safari included.
-  Every program is generated fresh. Its answer is computed in JavaScript and
-  checked against real Java (javac + java) for every runnable template.
-  Scope: creating objects, constructors, method signatures, static (class)
-  vs instance methods/variables, void vs non-void methods.
--->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;600&display=swap">
+<title>Static vs Instance — Java Methods Quiz</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Delius+Unicase:wght@700&display=swap">
 <style>
 :root {
-  --ink:#F3F6FA; --grid:#E2E9F2; --wire:#C3D0E1; --chalk:#101A2B; --dim:#4A5B74;
-  --signal:#D41B50; --amber:#B88500; --go:#1F9E57; --chipbg:rgba(195,208,225,.35);
-  --btn-ink:#101A2B; --btn-go:#5ADB8C; --btn-amber:#F2B705;
+  --desk:#FFD966; --desk-edge:#FFE699; --gold:#FFC200; --amber:#F89F00; --teal:#0097A7;
+  --char:#434343; --paper:#FFFFFF; --rule:#E3E8EF; --ink:#262626; --dim:#5B5B5B;
+  --right:#1E9E57; --wrong:#D7263D;
+  --hand:'Comic Neue','Comic Sans MS',cursive;
+  --head:'Arial Black','Arial',system-ui,sans-serif;
+  --body:Arial,Helvetica,system-ui,sans-serif;
   --mono:'Cascadia Mono','IBM Plex Mono',Consolas,'Courier New',monospace;
   box-sizing: border-box;
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --ink:#101A2B; --grid:#1E2F47; --wire:#2B3F5F; --chalk:#EAF0F7; --dim:#AEC0D8;
-    --signal:#ED225D; --amber:#F2B705; --go:#5ADB8C; --chipbg:rgba(43,63,95,.35);
-  }
+  :root:not([data-theme="light"]) { --desk:#3B3215; --desk-edge:#54481F; --ink:#262626; --dim:#5B5B5B; }
 }
-:root[data-theme="dark"] {
-  --ink:#101A2B; --grid:#1E2F47; --wire:#2B3F5F; --chalk:#EAF0F7; --dim:#AEC0D8;
-  --signal:#ED225D; --amber:#F2B705; --go:#5ADB8C; --chipbg:rgba(43,63,95,.35);
-}
+:root[data-theme="dark"] { --desk:#3B3215; --desk-edge:#54481F; }
 html { scroll-padding-top: env(safe-area-inset-top, 0px); }
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; min-height: 100%; }
-body {
-  background-color: var(--ink);
-  background-image: linear-gradient(var(--grid) 1px, transparent 1px),
-                    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-  background-size: 48px 48px;
-  color: var(--chalk); font: 17px/1.45 'IBM Plex Sans', system-ui, sans-serif;
-  padding: 14px 16px 20px;
+body { background: var(--desk); color: var(--ink); font: 17px/1.45 var(--body); padding: 14px; }
+
+/* the "desk" frame from the template */
+.desk {
+  max-width: 1120px; margin: 0 auto; position: relative;
+  border: 2px dashed var(--desk-edge); border-radius: 22px; padding: 18px 18px 26px;
 }
-.wrap { max-width: 1040px; margin: 0 auto; }
-code, textarea, .ln, .out, .askcode { font-family: var(--mono); font-variant-ligatures: none; font-feature-settings: 'liga' 0, 'calt' 0; }
 
-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
-.eyebrow { font: 600 13px/1 var(--mono); color: var(--signal); letter-spacing: .14em; text-transform: uppercase; }
-h1 { font: 700 34px/1.05 'Space Grotesk', sans-serif; letter-spacing: -.02em; margin: 6px 0 0; }
-.score { display: flex; gap: 10px; }
-.chip { border: 1px solid var(--wire); border-radius: 10px; padding: 8px 14px; background: var(--chipbg); text-align: center; min-width: 78px; }
-.chip b { display: block; font: 700 24px/1 'Space Grotesk', sans-serif; color: var(--chalk); }
-.chip span { font: 600 11px/1 var(--mono); color: var(--dim); letter-spacing: .1em; text-transform: uppercase; }
-.chip.hot b { color: var(--amber); }
+/* ---------- sticky notes ---------- */
+.sticky {
+  position: relative; background: var(--paper); border-radius: 6px 6px 18px 6px;
+  box-shadow: 0 6px 14px rgba(0,0,0,.18);
+}
+.sticky::after {           /* curled corner */
+  content: ""; position: absolute; right: 0; bottom: 0; width: 26px; height: 26px;
+  background: linear-gradient(135deg, #fff 45%, #D9D9D9 50%, #BDBDBD 100%);
+  border-radius: 0 0 18px 0; box-shadow: -2px -2px 4px rgba(0,0,0,.08);
+}
+.sticky.top { border-top: 18px solid #FFF2CC; }
 
-.topics { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 16px; }
+header { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.titlecard { padding: 14px 22px 16px; transform: rotate(-1.5deg); }
+.titlecard small { font: 700 14px/1 'Delius Unicase', var(--hand); color: var(--dim); }
+h1 { font: 900 32px/1.1 var(--head); margin: 6px 0 0; }
+.hl { background: linear-gradient(transparent 38%, var(--gold) 38%, var(--gold) 92%, transparent 92%); padding: 0 4px; }
+
+.score { display: flex; gap: 12px; flex-wrap: wrap; }
+.score .sticky { min-width: 92px; padding: 10px 14px 14px; text-align: center; }
+.score .sticky:nth-child(1) { transform: rotate(2deg); }
+.score .sticky:nth-child(2) { transform: rotate(-2deg); }
+.score .sticky:nth-child(3) { transform: rotate(1deg); }
+.score b { display: block; font: 900 28px/1 var(--head); }
+.score span { font: 700 14px/1 var(--hand); color: var(--dim); }
+.score .hot b { color: var(--amber); }
+
+.topics { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 16px; }
 .topics button {
-  font: 600 15px/1 var(--mono); color: var(--dim); background: transparent;
-  border: 1px solid var(--wire); border-radius: 22px; padding: 11px 18px; cursor: pointer;
+  font: 700 16px/1 var(--hand); color: var(--ink); background: #FFF2CC;
+  border: 0; border-radius: 10px 10px 4px 4px; padding: 12px 18px; cursor: pointer;
+  box-shadow: 0 3px 0 rgba(0,0,0,.12);
 }
-.topics button.on { color: var(--btn-ink); background: var(--btn-go); border-color: var(--btn-go); }
-button:focus-visible, textarea:focus-visible { outline: 3px solid var(--btn-amber); outline-offset: 2px; }
+.topics button.on { background: var(--char); color: #fff; }
+button:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
 
-.grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 16px; align-items: start; }
-@media (max-width: 820px) { .grid { grid-template-columns: 1fr; } }
+.grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 22px; align-items: start; }
+@media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+.grid > * { min-width: 0; }
+@media (max-width: 520px) { body { padding: 8px; } .desk { padding: 12px 10px 20px; } h1 { font-size: 26px; } .question h2 { font-size: 20px; } .ln { font-size: 13px; grid-template-columns: 30px 1fr; } }
 
-.panel { border: 1px solid #333; border-radius: 9px; overflow: hidden; background: #1E1E1E; }
-.tabbar { display: flex; background: #252526; border-bottom: 1px solid #333; min-height: 38px; font-size: 14px; }
-.tab { display: flex; align-items: center; gap: 8px; padding: 0 16px; color: #969696; }
-.tab.active { background: #1E1E1E; color: #fff; box-shadow: inset 0 2px 0 #0078D4; }
-.tab .ico { width: 18px; height: 18px; flex: none; }
-.tab .x { color: #7A7A7A; }
-.tabbar.pane { background: #1E1E1E; }
-.tabbar.pane .tab { text-transform: uppercase; letter-spacing: .09em; font-size: 12px; padding: 10px 16px; line-height: 1.3; }
-.tabbar.pane .tab.active { background: none; color: #E7E7E7; box-shadow: inset 0 -2px 0 #E7E7E7; }
-.tabbar.pane .tab.ask { text-transform: none; letter-spacing: 0; font-size: 16px; font-weight: 600; }
-.tag { margin-left: auto; align-self: center; padding: 0 14px; font: 600 12px var(--mono); color: #AEC0D8; text-transform: uppercase; letter-spacing: .1em; }
+/* ---------- spiral notepad holding the code ---------- */
+.notepad { position: relative; background: var(--paper); border-radius: 4px 4px 10px 10px; box-shadow: 0 10px 22px rgba(0,0,0,.2); }
+.notepad .spiral { height: 30px; background: var(--gold); border-radius: 4px 4px 0 0; position: relative; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; }
+.notepad .spiral::before {
+  content: ""; position: absolute; left: 10px; right: 10px; top: -8px; height: 16px;
+  background: repeating-linear-gradient(90deg, var(--char) 0 3px, transparent 3px 11px);
+  border-radius: 2px;
+}
+.spiral .file { font: 700 13px/1 var(--mono); color: var(--ink); margin-top: 6px; }
+.spiral .tag { font: 700 13px/1 var(--hand); background: #fff; padding: 4px 10px; border-radius: 10px; margin-top: 6px; }
+.lined {
+  --lh: 26px;
+  background: repeating-linear-gradient(var(--paper) 0 calc(var(--lh) - 1px), var(--rule) calc(var(--lh) - 1px) var(--lh));
+  background-position: 0 12px; padding: 12px 0 18px; overflow-x: auto;
+}
+.ln { display: grid; grid-template-columns: 38px 1fr; white-space: pre; font: 15.5px/26px var(--mono); color: var(--ink); padding-right: 14px; font-variant-ligatures: none; }
+.ln .num { color: #A7A7A7; text-align: right; padding-right: 12px; }
+.kw{color:#0B6E99;font-weight:700} .ty{color:#B35C00} .st{color:#A31515} .nu{color:#098658} .cm{color:#6A8759;font-style:italic}
 
-.body { padding: 12px 0; font-size: 16.5px; line-height: 1.5; overflow-x: auto; }
-.ln { display: grid; grid-template-columns: 42px 1fr; white-space: pre; padding: 0 14px 0 0; color: #D4D4D4; }
-.ln .num { color: #4A5B74; text-align: right; padding-right: 12px; }
-.kw{color:#569CD6} .ty{color:#4EC9B0} .st{color:#CE9178} .nu{color:#B5CEA8} .cm{color:#6A9955}
-
-.askcode { white-space: pre; background: #161616; color: #D4D4D4; font-size: 16px; line-height: 1.55;
-           padding: 10px 16px; border-bottom: 1px solid #333; overflow-x: auto; }
+/* ---------- question + Kahoot-style tiles ---------- */
+.question { padding: 16px 20px 18px; margin-bottom: 16px; }
+.question h2 { font: 900 24px/1.25 var(--head); margin: 0; }
+.askcode { margin-top: 12px; white-space: pre; font: 15px/1.6 var(--mono); background: #FFF8E1; border-left: 4px solid var(--gold); padding: 8px 12px; overflow-x: auto; }
 .askcode:empty { display: none; }
-textarea {
-  width: 100%; min-height: 170px; resize: vertical; border: 0; outline: none;
-  background: #000; color: #D4D4D4; font-size: 19px; line-height: 1.55;
-  padding: 14px 16px; display: block;
-}
-textarea::placeholder { color: #6B7C95; }
-.answer-panel { border: 2px solid var(--wire); }
-.answer-panel.right { border-color: var(--go); }
-.answer-panel.wrong { border-color: var(--signal); }
 
-.actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
-.actions button {
-  font: 700 17px/1 'Space Grotesk', sans-serif; border-radius: 10px; padding: 15px 22px;
-  border: 0; cursor: pointer; letter-spacing: .01em;
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tiles.two { grid-template-columns: 1fr 1fr; }
+@media (max-width: 460px) { .tiles { grid-template-columns: 1fr; } }
+.tile {
+  position: relative; display: flex; align-items: center; gap: 12px; text-align: left;
+  min-height: 92px; padding: 14px 16px; border: 0; border-radius: 10px; cursor: pointer;
+  font: 700 19px/1.35 var(--mono); box-shadow: 0 5px 0 rgba(0,0,0,.22);
+  transition: transform .08s, opacity .2s;
 }
-.primary { background: var(--btn-go); color: var(--btn-ink); flex: 1 1 140px; }
-.ghost { background: transparent; color: var(--chalk); border: 1px solid var(--wire) !important; }
-.next { background: var(--btn-amber); color: var(--btn-ink); flex: 1 1 140px; }
-button:disabled { opacity: .35; cursor: default; }
-.hint { margin-top: 10px; color: var(--dim); font-size: 14px; }
+.tile:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,.22); }
+.tile .shape { width: 30px; height: 30px; flex: none; }
+.tile .txt { white-space: pre-wrap; word-break: break-word; }
+.tile .txt.word { font-family: var(--head); font-weight: 900; }
+.t0 { background: var(--teal); color: #fff; }   .t0 .shape { fill: #fff; }
+.t1 { background: var(--amber); color: #1D1D1D; } .t1 .shape { fill: #1D1D1D; }
+.t2 { background: var(--char); color: #fff; }   .t2 .shape { fill: var(--gold); }
+.t3 { background: #fff; color: #1D1D1D; }        .t3 .shape { fill: var(--teal); }
+.tile .key { position: absolute; top: 6px; right: 10px; font: 700 12px/1 var(--hand); opacity: .7; }
+.tile:disabled { cursor: default; }
+.tile.dim { opacity: .3; }
+.tile.correct { outline: 5px solid var(--right); outline-offset: 2px; opacity: 1; }
+.tile.picked.wrongpick { outline: 5px solid var(--wrong); outline-offset: 2px; opacity: 1; }
+.tile .mark { position: absolute; top: -12px; right: -10px; width: 34px; height: 34px; border-radius: 50%;
+  display: none; place-items: center; font: 900 20px/1 var(--head); color: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.25); }
+.tile.correct .mark { display: grid; background: var(--right); }
+.tile.wrongpick .mark { display: grid; background: var(--wrong); }
 
-.feedback { margin-top: 14px; display: none; }
+/* ---------- feedback ---------- */
+.feedback { display: none; margin-top: 18px; }
 .feedback.show { display: block; }
-.verdict { font: 700 22px/1.2 'Space Grotesk', sans-serif; margin: 0 0 10px; }
-.verdict.right { color: var(--go); } .verdict.wrong { color: var(--signal); }
-.out { white-space: pre-wrap; padding: 12px 16px; font-size: 18px; line-height: 1.55; color: #D4D4D4; background: #000; overflow-x: auto; }
-.out .miss { color: #FF8FA8; font-weight: 700; }
-.out .none { color: #8494AB; font-style: italic; }
-.out .err { color: #FF8FA8; }
-.tip { margin-top: 12px; border-left: 5px solid var(--btn-amber); background: rgba(242,183,5,.12);
-       padding: 11px 16px; border-radius: 0 8px 8px 0; font-size: 17px; }
-.tip b { display: block; font: 600 12px/1 var(--mono); color: var(--amber); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 5px; }
-footer { margin-top: 22px; color: var(--dim); font-size: 14px; text-align: center; }
+.banner { display: inline-block; font: 900 26px/1 var(--head); color: #fff; padding: 12px 20px; border-radius: 10px; transform: rotate(-1deg); margin-bottom: 12px; }
+.banner.right { background: var(--right); } .banner.wrong { background: var(--wrong); }
+.errmsg { font: 14px/1.5 var(--mono); color: #B00020; background: #fff; border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; white-space: pre-wrap; box-shadow: 0 3px 8px rgba(0,0,0,.12); }
+.why { padding: 14px 20px 20px; transform: rotate(.6deg); }
+.why b { font: 700 18px/1 var(--hand); display: block; margin-bottom: 6px; }
+.why p { margin: 0; font-size: 17px; }
+.next {
+  margin-top: 16px; width: 100%; border: 0; border-radius: 12px; padding: 16px; cursor: pointer;
+  font: 900 20px/1 var(--head); background: var(--char); color: var(--gold); box-shadow: 0 5px 0 rgba(0,0,0,.3);
+}
+.next:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,.3); }
+
+/* desk props */
+.pencil { position: absolute; right: -54px; top: 120px; width: 40px; height: 320px; transform: rotate(12deg); }
+@media (max-width: 1260px) { .pencil { display: none; } }
+footer { margin-top: 22px; text-align: center; font: 700 15px/1.4 var(--hand); color: var(--ink); opacity: .8; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) footer { color: #F3E6B8; } }
+:root[data-theme="dark"] footer { color: #F3E6B8; }
+@media (prefers-reduced-motion: reduce) { .tile { transition: none; } }
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="desk">
+
+<svg class="pencil" viewBox="0 0 40 320" aria-hidden="true">
+  <rect x="8" y="0" width="24" height="22" rx="4" fill="#F28B9B"/>
+  <rect x="8" y="20" width="24" height="16" fill="#BDBDBD"/>
+  <rect x="8" y="36" width="24" height="220" fill="#FFC200"/>
+  <rect x="16" y="36" width="8" height="220" fill="#F8B000"/>
+  <polygon points="8,256 32,256 20,300" fill="#F5D7A1"/>
+  <polygon points="15,284 25,284 20,300" fill="#434343"/>
+</svg>
 
 <header>
-  <div>
-    <span class="eyebrow">AP CSA · Reteach</span>
-    <h1>Static vs Instance</h1>
+  <div class="sticky titlecard">
+    <small>AP CSA reteach</small>
+    <h1><span class="hl">Static vs Instance</span></h1>
   </div>
   <div class="score">
-    <div class="chip" id="streakChip"><b id="streak">0</b><span>streak</span></div>
-    <div class="chip"><b id="best">0</b><span>best</span></div>
-    <div class="chip"><b id="tally">0/0</b><span>right</span></div>
+    <div class="sticky" id="streakChip"><b id="streak">0</b><span>streak</span></div>
+    <div class="sticky"><b id="best">0</b><span>best</span></div>
+    <div class="sticky"><b id="tally">0/0</b><span>correct</span></div>
   </div>
 </header>
 
@@ -145,51 +183,40 @@ footer { margin-top: 22px; color: var(--dim); font-size: 14px; text-align: cente
 </div>
 
 <div class="grid">
-  <div class="panel">
-    <div class="tabbar">
-      <span class="tab active"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="4" fill="#E76F00"/><path d="M13.5 6v8.2c0 2.3-1.4 3.6-3.6 3.6-1.2 0-2.2-.4-2.9-1.1l1.1-1.6c.5.5 1.1.8 1.7.8.8 0 1.4-.5 1.4-1.8V6h2.3z" fill="#fff"/></svg>Main.java<span class="x">&times;</span></span>
-      <span class="tag" id="topicTag"></span>
-    </div>
-    <div class="body" id="code"></div>
+  <div class="notepad">
+    <div class="spiral"><span class="file">Main.java</span><span class="tag" id="topicTag"></span></div>
+    <div class="lined" id="code"></div>
   </div>
 
   <div>
-    <div class="panel answer-panel" id="answerPanel">
-      <div class="tabbar pane"><span class="tab active ask" id="ask">What prints?</span></div>
+    <div class="sticky question">
+      <h2><span class="hl" id="ask">What prints?</span></h2>
       <div class="askcode" id="askcode"></div>
-      <textarea id="answer" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-        placeholder="Type exactly what prints.&#10;One value per line.&#10;Won't compile or crashes? Type: error"></textarea>
     </div>
-    <div class="actions">
-      <button class="primary" id="check">Check</button>
-      <button class="ghost" id="error">Error</button>
-      <button class="next" id="next">Next &rarr;</button>
+    <div class="tiles" id="tiles"></div>
+
+    <div class="feedback" id="feedback">
+      <div class="banner" id="banner"></div>
+      <div class="errmsg" id="errmsg" hidden></div>
+      <div class="sticky top why"><b>Why?</b><p id="tip"></p></div>
+      <button class="next" id="next">Next question</button>
     </div>
-    <div class="hint">Ctrl/&#8984; + Enter checks, then goes to the next one.</div>
   </div>
 </div>
 
-<div class="feedback" id="feedback">
-  <p class="verdict" id="verdict"></p>
-  <div class="panel">
-    <div class="tabbar pane"><span class="tab">Problems</span><span class="tab active" id="outLabel">Terminal</span></div>
-    <div class="out" id="out"></div>
-  </div>
-  <div class="tip" id="tip"></div>
-</div>
-
-<footer>A new program every time. Get a streak of 10 &mdash; then switch topic.</footer>
+<footer>Tap an answer (or press 1&ndash;4). A new program every time &mdash; get a streak of 10, then switch topic.</footer>
 </div>
 
 <script>
 /* =====================================================================
-   OBJECTS & METHODS DRILLS — generator engine (Java).
-   Every template returns { code, out, tip, ask?, askCode?, cs?, show?, noRun? }.
-   `out` is what Java prints (or ["error"] for compile/runtime errors).
+   OBJECTS & METHODS QUIZ — generator engine (Java).
+   Each template returns { code, out, wrong, tip, ask?, askCode?, show?, noRun?, choices? }.
+   out    = what Java really prints (["error"] = compile/runtime error, [] = nothing).
+   wrong  = misconception-based distractors in the same shape as out.
    Runnable templates are verified against real Java by a test harness.
    ===================================================================== */
 (function (root) {
-  function rng(seed) {                       // mulberry32 - seedable for testing
+  function rng(seed) {
     let a = seed >>> 0;
     return function () {
       a |= 0; a = (a + 0x6D2B79F5) | 0;
@@ -202,11 +229,10 @@ footer { margin-top: 22px; color: var(--dim); font-size: 14px; text-align: cente
   const PETS  = ["Rex", "Milo", "Luna", "Coco", "Bolt", "Nala"];
   const I = n => "    ".repeat(n);
   const P = x => `System.out.println(${x});`;
-  const jd = x => Number.isInteger(x) ? x.toFixed(1) : String(x);   // Java double printing
+  const jd = x => Number.isInteger(x) ? x.toFixed(1) : String(x);
+  const ERR = ["error"];
 
-  function classBlock(name, lines) {
-    return [`class ${name} {`, ...lines.map(l => I(1) + l), "}"];
-  }
+  function classBlock(name, lines) { return [`class ${name} {`, ...lines.map(l => I(1) + l), "}"]; }
   function mainWrap(lines, helpers) {
     const out = ["public class Main {"];
     if (helpers) { helpers.forEach(l => out.push(I(1) + l)); out.push(""); }
@@ -215,8 +241,7 @@ footer { margin-top: 22px; color: var(--dim); font-size: 14px; text-align: cente
     out.push(I(1) + "}", "}");
     return out;
   }
-  const program = (cls, mainLines, helpers) =>
-    (cls ? [...cls, ""] : []).concat(mainWrap(mainLines, helpers)).join("\n");
+  const program = (cls, mainLines, helpers) => (cls ? [...cls, ""] : []).concat(mainWrap(mainLines, helpers)).join("\n");
 
   const COUNTER = [
     "private int count;",
@@ -232,7 +257,7 @@ footer { margin-top: 22px; color: var(--dim); font-size: 14px; text-align: cente
     const shuffle = arr => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
     const T = {
-      /* ---------------- objects: new, constructors, instance state ---------------- */
+      /* ---------------- objects ---------------- */
       o_ctor() {
         const w = int(2, 9), h = int(2, 9), per = coin();
         const m = per ? "getPerimeter" : "getArea";
@@ -242,16 +267,17 @@ footer { margin-top: 22px; color: var(--dim); font-size: 14px; text-align: cente
           `public int ${m}() {`, `    return ${per ? "2 * (w + h)" : "w * h"};`, "}",
         ]), [`Box b = new Box(${w}, ${h});`, P(`b.${m}()`)]);
         return { code, out: [per ? 2 * (w + h) : w * h],
+                 wrong: per ? [[w * h], [w + h], [2 * w + h]] : [[2 * (w + h)], [w + h], ERR],
                  tip: "new Box(...) calls the constructor, which stores the arguments in the object's instance variables. The method then works with those stored values." };
       },
       o_two() {
         const s1 = int(0, 5), s2 = int(0, 5), x = int(1, 9), y = int(1, 9), z = int(1, 9);
         const code = program(classBlock("Counter", COUNTER), [
           `Counter a = new Counter(${s1});`, `Counter b = new Counter(${s2});`,
-          `a.add(${x});`, `b.add(${y});`, `a.add(${z});`,
-          P("a.getCount()"), P("b.getCount()"),
+          `a.add(${x});`, `b.add(${y});`, `a.add(${z});`, P("a.getCount()"), P("b.getCount()"),
         ]);
         return { code, out: [s1 + x + z, s2 + y],
+                 wrong: [[s1 + x + y + z, s1 + x + y + z], [s1 + x, s2 + y], [s2 + y, s1 + x + z]],
                  tip: "a and b are two separate objects - each has its OWN count. Calling a.add(...) never touches b." };
       },
       o_alias() {
@@ -261,8 +287,10 @@ footer { margin-top: 22px; color: var(--dim); font-size: 14px; text-align: cente
           `b.add(${x});`, `a.add(${y});`, P("a.getCount()"), P("b.getCount()"),
         ]);
         return alias
-          ? { code, out: [s + x + y, s + x + y], tip: "Counter b = a; does NOT create an object. b and a are two names for the SAME object, so every add shows up through both. Only new creates an object." }
-          : { code, out: [s + y, s + x], tip: "Two uses of new = two separate objects. They start with the same value but change independently." };
+          ? { code, out: [s + x + y, s + x + y], wrong: [[s + y, s + x], [s + x + y, s + x], [s, s]],
+              tip: "Counter b = a; does NOT create an object. b and a are two names for the SAME object, so every add shows up through both. Only new creates an object." }
+          : { code, out: [s + y, s + x], wrong: [[s + x + y, s + x + y], [s + x, s + y], [s, s]],
+              tip: "Two uses of new = two separate objects. They start with the same value but change independently." };
       },
       o_default() {
         const C = pick(["Coin", "Card", "Ticket", "Badge"]), first = coin();
@@ -272,6 +300,7 @@ footer { margin-top: 22px; color: var(--dim); font-size: 14px; text-align: cente
           "public String getLabel() {", "    return label;", "}",
         ]), [`${C} c = new ${C}();`, P(first ? "c.getValue()" : "c.getLabel()"), P(first ? "c.getLabel()" : "c.getValue()")]);
         return { code, out: first ? ["0", "null"] : ["null", "0"],
+                 wrong: [ERR, ["0", "0"], ["null", "null"]],
                  tip: "No constructor is written, so Java supplies an empty one. Instance variables nobody sets get defaults: 0 for int, null for objects like String." };
       },
       o_shadow() {
@@ -282,39 +311,42 @@ footer { margin-top: 22px; color: var(--dim); font-size: 14px; text-align: cente
           "public int getW() {", "    return w;", "}",
         ]), [`Box b = new Box(${v});`, P("b.getW()")]);
         return bug
-          ? { code, out: [0], tip: "Inside the constructor, w means the PARAMETER. w = w copies the parameter onto itself, so the instance variable stays at its default 0. Fix: this.w = w;" }
-          : { code, out: [v], tip: "this.w is the instance variable; plain w is the parameter. this.w = w; stores the argument in the object." };
+          ? { code, out: [0], wrong: [[v], ERR, ["null"]],
+              tip: "Inside the constructor, w means the PARAMETER. w = w copies the parameter onto itself, so the instance variable stays at its default 0. Fix: this.w = w;" }
+          : { code, out: [v], wrong: [[0], ERR, ["w"]],
+              tip: "this.w is the instance variable; plain w is the parameter. this.w = w; stores the argument in the object." };
       },
       o_setter() {
-        const w = int(2, 6), h = int(2, 6), n = int(2, 9);
+        const w = int(2, 6), h = int(2, 6); let n = int(2, 9); if (n === w) n++;
         const code = program(classBlock("Box", [
           "private int w;", "private int h;",
           "public Box(int w, int h) {", "    this.w = w;", "    this.h = h;", "}",
           "public void setW(int newW) {", "    w = newW;", "}",
           "public int getArea() {", "    return w * h;", "}",
         ]), [`Box b = new Box(${w}, ${h});`, P("b.getArea()"), `b.setW(${n});`, P("b.getArea()")]);
-        return { code, out: [w * h, n * h],
+        return { code, out: [w * h, n * h], wrong: [[w * h, w * h], [n * h, n * h], [w * h, n]],
                  tip: "setW is a void mutator: it changes the object's state and returns nothing. The second getArea() sees the new w." };
       },
       o_null() {
-        const x = int(1, 9), made = coin(), s = int(0, 5);
+        const x = int(1, 9), made = coin(), s = int(1, 5);
         const code = program(classBlock("Counter", COUNTER), [
           made ? `Counter c = new Counter(${s});` : "Counter c = null;", `c.add(${x});`, P("c.getCount()"),
         ]);
         return made
-          ? { code, out: [s + x], tip: "new Counter(...) creates the object, so c refers to something real and the methods run normally." }
-          : { code, out: ["error"], show: 'Exception in thread "main" java.lang.NullPointerException',
+          ? { code, out: [s + x], wrong: [[x], ERR, [s]],
+              tip: "new Counter(...) creates the object, so c refers to something real and the methods run normally." }
+          : { code, out: ERR, wrong: [[x], [0], ["null"]], show: 'Exception in thread "main" java.lang.NullPointerException',
               tip: "c holds null - it refers to NO object, because new was never called. Calling a method on null crashes at run time." };
       },
 
-      /* ---------------- static: class methods & shared variables ---------------- */
+      /* ---------------- static ---------------- */
       st_call() {
         const f = pick([["triple", "n * 3", n => n * 3], ["square", "n * n", n => n * n], ["addTen", "n + 10", n => n + 10]]);
         const a = int(2, 9), b = int(2, 4);
         const code = program(classBlock("Calc", [
           `public static int ${f[0]}(int n) {`, `    return ${f[1]};`, "}",
         ]), [P(`Calc.${f[0]}(${a})`), P(`Calc.${f[0]}(Calc.${f[0]}(${b}))`)]);
-        return { code, out: [f[2](a), f[2](f[2](b))],
+        return { code, out: [f[2](a), f[2](f[2](b))], wrong: [[f[2](a), f[2](b)], [a, f[2](b)], ERR],
                  tip: `${f[0]} is static - a class method. It is called on the CLASS name (Calc.${f[0]}), no object needed. The inner call's return value becomes the outer call's argument.` };
       },
       st_count() {
@@ -328,7 +360,7 @@ footer { margin-top: 22px; color: var(--dim); font-size: 14px; text-align: cente
           "public int getId() {", "    return id;", "}",
           "public static int getCount() {", "    return count;", "}",
         ]), lines);
-        return { code, out: [j, k],
+        return { code, out: [j, k], wrong: [[k, k], [j, j], [1, 1], [j, 1]],
                  tip: "count is static: ONE copy shared by every Player, so it keeps climbing. id is an instance variable: each Player keeps its own copy of what count was when it was made." };
       },
       st_shared() {
@@ -339,8 +371,10 @@ footer { margin-top: 22px; color: var(--dim); font-size: 14px; text-align: cente
           "public int getScore() {", "    return score;", "}",
         ]), ["Team a = new Team();", "Team b = new Team();", `a.addPoints(${x});`, `b.addPoints(${y});`, P("a.getScore()"), P("b.getScore()")]);
         return isStatic
-          ? { code, out: [x + y, x + y], tip: "score is static - there is ONE score for the whole class. Both objects add to the same variable, so both report the total." }
-          : { code, out: [x, y], tip: "score is an instance variable - every Team gets its own. a and b each keep their own points." };
+          ? { code, out: [x + y, x + y], wrong: [[x, y], [x, x + y], ERR],
+              tip: "score is static - there is ONE score for the whole class. Both objects add to the same variable, so both report the total." }
+          : { code, out: [x, y], wrong: [[x + y, x + y], [x, x + y], [0, 0]],
+              tip: "score is an instance variable - every Team gets its own. a and b each keep their own points." };
       },
       st_math() {
         const opts = [
@@ -349,9 +383,11 @@ footer { margin-top: 22px; color: var(--dim); font-size: 14px; text-align: cente
           () => { const r = int(2, 9); return [`Math.sqrt(${r * r})`, jd(r)]; },
           () => { const a = int(1, 9), b = int(10, 19); return coin() ? [`Math.max(${a}, ${b})`, String(b)] : [`Math.min(${b}, ${a})`, String(a)]; },
         ];
+        const tog = s => s.endsWith(".0") ? s.slice(0, -2) : s + ".0";
         const [i1, i2] = shuffle([0, 1, 2, 3]);
         const A = opts[i1](), B = opts[i2]();
         return { code: program(null, [P(A[0]), P(B[0])]), out: [A[1], B[1]],
+                 wrong: [[tog(A[1]), B[1]], [A[1], tog(B[1])], [tog(A[1]), tog(B[1])]],
                  tip: "Math methods are static - called on the class: Math.name(...). Math.pow and Math.sqrt return double (so you see .0). abs, max and min with int arguments return int." };
       },
       st_target() {
@@ -362,9 +398,10 @@ footer { margin-top: 22px; color: var(--dim); font-size: 14px; text-align: cente
           "public int getW() {", "    return w;", "}",
         ]), [`Box b = new Box(${w});`, P(bad ? "Box.getW()" : "b.getW()")]);
         return bad
-          ? { code, out: ["error"], show: "error: non-static method getW() cannot be referenced from a static context",
+          ? { code, out: ERR, wrong: [[w], [0], ["null"]], show: "error: non-static method getW() cannot be referenced from a static context",
               tip: "getW is an instance method - it needs a specific Box object. Call it on the object (b.getW()). Only static methods are called on the class name." }
-          : { code, out: [w], tip: "getW is an instance method called on the object b - correct. It returns b's own w." };
+          : { code, out: [w], wrong: [ERR, [0], ["b"]],
+              tip: "getW is an instance method called on the object b - correct. It returns b's own w." };
       },
       st_context() {
         const name = pick(PETS), bad = coin();
@@ -374,70 +411,78 @@ footer { margin-top: 22px; color: var(--dim); font-size: 14px; text-align: cente
           bad ? "public static String getName() {" : "public String getName() {", "    return name;", "}",
         ]), [`Dog d = new Dog("${name}");`, P("d.getName()")]);
         return bad
-          ? { code, out: ["error"], show: "error: non-static variable name cannot be referenced from a static context",
+          ? { code, out: ERR, wrong: [[name], ["null"], ["n"]], show: "error: non-static variable name cannot be referenced from a static context",
               tip: "A static method belongs to the class, not to any one Dog - so it has no name to read. Static methods cannot use instance variables." }
-          : { code, out: [name], tip: "getName is an instance method, so it can read this Dog's name." };
+          : { code, out: [name], wrong: [ERR, ["null"], ["n"]],
+              tip: "getName is an instance method, so it can read this Dog's name." };
       },
 
-      /* ---------------- void vs non-void (return) ---------------- */
+      /* ---------------- void vs return ---------------- */
       r_ignored() {
         const f = pick([["doubleIt", "n * 2", n => n * 2], ["addFive", "n + 5", n => n + 5], ["half", "n / 2", n => Math.trunc(n / 2)]]);
         const a = int(3, 9);
         const code = program(null, [`int x = ${a};`, `${f[0]}(x);`, P("x"), `x = ${f[0]}(x);`, P("x")],
           [`public static int ${f[0]}(int n) {`, `    return ${f[1]};`, "}"]);
-        return { code, out: [a, f[2](a)],
+        return { code, out: [a, f[2](a)], wrong: [[f[2](a), f[2](a)], [f[2](a), f[2](f[2](a))], [a, a]],
                  tip: `${f[0]}(x); on its own throws the returned value away - x does not change. x = ${f[0]}(x); STORES the return value.` };
       },
       r_void() {
         const g = pick(["Hi", "Hello", "Bye"]), [n1, n2] = shuffle(NAMES);
         const code = program(null, [`greet("${n1}");`, `greet("${n2}");`],
           ["public static void greet(String name) {", `    System.out.println("${g} " + name);`, "}"]);
-        return { code, out: [`${g} ${n1}`, `${g} ${n2}`],
+        return { code, out: [`${g} ${n1}`, `${g} ${n2}`], wrong: [[n1, n2], [], ERR],
                  tip: "greet is void - it returns nothing. Its output comes from the println INSIDE it, which runs once per call." };
       },
       r_voiderr() {
         const n = int(2, 9), v = pick([0, 1, 2]);
         const line = [P(`show(${n})`), `int r = show(${n});`, `show(${n});`][v];
         const code = program(null, [line], ["public static void show(int n) {", "    System.out.println(n);", "}"]);
-        if (v === 0) return { code, out: ["error"], show: "error: 'void' type not allowed here",
+        if (v === 0) return { code, out: ERR, wrong: [[n], [n, n], []], show: "error: 'void' type not allowed here",
           tip: "show is void, so there is no value to hand to println. You can only print a method's result if it returns something." };
-        if (v === 1) return { code, out: ["error"], show: "error: incompatible types: void cannot be converted to int",
+        if (v === 1) return { code, out: ERR, wrong: [[n], [], [0]], show: "error: incompatible types: void cannot be converted to int",
           tip: "show is void - it returns nothing, so there is nothing to store in r." };
-        return { code, out: [n], tip: "A void method is called as a statement on its own. The println inside it does the printing." };
+        return { code, out: [n], wrong: [ERR, [], [n, n]], tip: "A void method is called as a statement on its own. The println inside it does the printing." };
       },
       r_both() {
         const a = int(2, 9), store = coin();
         const code = program(null, store ? [`int r = show(${a});`, P('"out " + r')] : [`show(${a});`, P('"done"')],
           ["public static int show(int n) {", '    System.out.println("in " + n);', "    return n + 1;", "}"]);
-        return { code, out: store ? [`in ${a}`, `out ${a + 1}`] : [`in ${a}`, "done"],
-                 tip: store ? "Printing and returning are different jobs. The println inside show runs during the call; the return value only appears because main prints r."
-                            : "The println inside show runs during the call. The returned value is never stored or printed, so it just disappears." };
+        return store
+          ? { code, out: [`in ${a}`, `out ${a + 1}`], wrong: [[`out ${a + 1}`], [`in ${a}`, `out ${a}`], [`out ${a + 1}`, `in ${a}`]],
+              tip: "Printing and returning are different jobs. The println inside show runs during the call; the return value only appears because main prints r." }
+          : { code, out: [`in ${a}`, "done"], wrong: [["done"], [`in ${a}`, String(a + 1), "done"], [String(a + 1), "done"]],
+              tip: "The println inside show runs during the call. The returned value is never stored or printed, so it just disappears." };
       },
       r_intdiv() {
         let a = int(2, 9), b = int(2, 9); if ((a + b) % 2 === 0) b++;
-        const dbl = coin();
+        const dbl = coin(), t = Math.trunc((a + b) / 2);
         const code = program(null, [P(`avg(${a}, ${b})`)],
           ["public static double avg(int a, int b) {", `    return (a + b) / ${dbl ? "2.0" : "2"};`, "}"]);
-        return { code, out: [dbl ? jd((a + b) / 2) : jd(Math.trunc((a + b) / 2))],
-                 tip: dbl ? "Dividing by 2.0 makes it double division, so the .5 is kept."
-                          : "(a + b) / 2 is int / int, so the decimal is chopped first. THEN it is returned as a double - that's why you see .0." };
+        return dbl
+          ? { code, out: [jd((a + b) / 2)], wrong: [[jd(t)], [t], ERR], tip: "Dividing by 2.0 makes it double division, so the .5 is kept." }
+          : { code, out: [jd(t)], wrong: [[jd((a + b) / 2)], [t], ERR],
+              tip: "(a + b) / 2 is int / int, so the decimal is chopped first. THEN it is returned as a double - that's why you see .0." };
       },
       r_chain() {
         const a = int(1, 9), b = int(1, 9), c = int(2, 5), v = coin();
         const code = program(null, v ? [`int r = add(add(${a}, ${b}), ${c});`, P("r")] : [P(`add(${a}, ${b}) * ${c}`)],
           ["public static int add(int x, int y) {", "    return x + y;", "}"]);
         return { code, out: [v ? a + b + c : (a + b) * c],
+                 wrong: v ? [[a + b], [c], ERR] : [[a + b * c], [a + b + c], ERR],
                  tip: "A non-void call can be used anywhere a value fits. Work inside-out: replace each call with the value it returns." };
       },
       r_string() {
         const [w1, w2] = shuffle(["hey", "yo", "go", "wow", "nice"]), v = coin();
         const code = program(null, [P(v ? `shout("${w1}") + shout("${w2}")` : `shout(shout("${w1}"))`)],
           ["public static String shout(String w) {", '    return w + "!";', "}"]);
-        return { code, out: [v ? `${w1}!${w2}!` : `${w1}!!`],
-                 tip: "shout returns a String. Each call is replaced by its returned value, then + joins the Strings." };
+        return v
+          ? { code, out: [`${w1}!${w2}!`], wrong: [[`${w1}${w2}!`], [`${w1}${w2}`], [`${w1}!`, `${w2}!`]],
+              tip: "shout returns a String. Each call is replaced by its returned value, then + joins the Strings." }
+          : { code, out: [`${w1}!!`], wrong: [[`${w1}!`], [w1], ERR],
+              tip: "The inner shout returns the word with one !, and that becomes the outer call's argument - so it gets a second !." };
       },
 
-      /* ---------------- signatures: reading method headers ---------------- */
+      /* ---------------- signatures ---------------- */
       g_sig() {
         const C = pick(["Pet", "Student", "Player", "Member"]), v = C[0].toLowerCase();
         const POOL = [
@@ -459,33 +504,38 @@ footer { margin-top: 22px; color: var(--dim); font-size: 14px; text-align: cente
         const lit = t => t === "int" ? String(int(1, 20)) : t === "String" ? `"${pick(NAMES)}"` : t === "double" ? "2.5" : "true";
         const badLit = t => t === "int" ? `"${int(1, 9)}"` : t === "String" ? String(int(1, 9)) : "\"yes\"";
         const callOn = (m, args) => `${m.st ? C : v}.${m.n}(${args.join(", ")})`;
-        const make = `${C} ${v} = new ${C}("${pick(NAMES)}", ${int(10, 17)});`;
+        const mk = `${C} ${v} = new ${C}("${pick(NAMES)}", ${int(10, 17)});`;
         const m = pick(methods);
+        const TYPES = ["int", "double", "String", "boolean", "void"];
         const kind = pick(["ret", "ret", "params", "static", "static", "ctor", "store", "store", "call", "call"]);
 
-        if (kind === "ret") return { code, noRun: true, cs: true, ask: `What is the return type of ${m.n}?`, out: [m.ret],
-          tip: `The return type is the word right before the method name.${m.ret === "void" ? " void means the method returns nothing." : ""} Java is case-sensitive: String has a capital S.` };
+        if (kind === "ret") return { code, noRun: true, ask: `What is the return type of ${m.n}?`, out: [m.ret],
+          choices: [m.ret, ...shuffle(TYPES.filter(t => t !== m.ret)).slice(0, 3)],
+          tip: `The return type is the word right before the method name.${m.ret === "void" ? " void means the method returns nothing." : ""}` };
         if (kind === "params") { const t = pick([m, ctor]);
           return { code, noRun: true, ask: `How many parameters does ${t.ctor ? "the constructor" : t.n} take?`, out: [t.ps.length],
+            choices: ["0", "1", "2", "3"],
             tip: "Count the declarations inside the parentheses - each parameter is a type followed by a name." }; }
         if (kind === "static") return { code, noRun: true, ask: `Is ${m.n} a static or an instance method?`, out: [m.st ? "static" : "instance"],
+          choices: ["static", "instance"],
           tip: m.st ? `The header says static, so it is a class method - call it as ${C}.${m.n}(...).` : `No static in the header, so it is an instance method - call it on an object, like ${v}.${m.n}(...).` };
-        if (kind === "ctor") return { code, noRun: true, ask: "Which line number is the constructor?", out: [all.indexOf(ctor) + 2],
-          tip: "A constructor has the SAME name as the class and NO return type - not even void." };
-        if (kind === "store") return { code, noRun: true, cs: m.ret !== "void", ask: "What type goes in the blank? (Type error if nothing can be stored.)",
-          askCode: `${make}\n_____ r = ${callOn(m, m.ps.map(lit))};`,
-          out: [m.ret === "void" ? "error" : m.ret], show: m.ret === "void" ? `${m.n} is void - there is no value to store.` : null,
-          tip: m.ret === "void" ? "A void method returns nothing, so its call can't be assigned to a variable." : `The variable's type must match the return type in the header: ${m.ret}.` };
-        // which call compiles?
+        if (kind === "ctor") { const line = String(all.indexOf(ctor) + 2);
+          return { code, noRun: true, ask: "Which line number is the constructor?", out: [line],
+            choices: [line, ...shuffle(["2", "3", "4", "5", "6"].filter(x => x !== line)).slice(0, 3)],
+            tip: "A constructor has the SAME name as the class and NO return type - not even void." }; }
+        if (kind === "store") { const right = m.ret === "void" ? "error" : m.ret;
+          const rest = shuffle(["int", "double", "String", "boolean", "error"].filter(t => t !== right));
+          if (m.ret === "void") rest.unshift("void");
+          return { code, noRun: true, ask: "What type goes in the blank?",
+            askCode: `${mk}\n_____ r = ${callOn(m, m.ps.map(lit))};`, out: [right], choices: [right, ...rest.slice(0, 3)],
+            show: m.ret === "void" ? `${m.n} is void - there is no value to store.` : null,
+            tip: m.ret === "void" ? "A void method returns nothing, so its call can't be assigned to a variable." : `The variable's type must match the return type in the header: ${m.ret}.` }; }
         const good = callOn(m, m.ps.map(lit));
-        const wrongs = [];
-        wrongs.push(callOn(m, m.ps.length ? m.ps.slice(1).map(lit) : ["5"]));                      // wrong number of args
-        if (m.ps.length) wrongs.push(callOn(m, m.ps.map((t, i) => i === 0 ? badLit(t) : lit(t))));  // wrong type
-        wrongs.push(m.st ? `${m.n}(${m.ps.map(lit).join(", ")})` : `${C}.${m.n}(${m.ps.map(lit).join(", ")})`); // wrong target
-        const opts = shuffle([good, ...shuffle(wrongs).slice(0, 2)]);
-        const letter = "ABC"[opts.indexOf(good)];
-        return { code, noRun: true, ask: "Which call compiles? Type A, B or C.",
-          askCode: `// in main (another class):\n${make}\nA: ${opts[0]};\nB: ${opts[1]};\nC: ${opts[2]};`, out: [letter],
+        const wrongs = [callOn(m, m.ps.length ? m.ps.slice(1).map(lit) : ["5"])];
+        if (m.ps.length) wrongs.push(callOn(m, m.ps.map((t, i) => i === 0 ? badLit(t) : lit(t))));
+        wrongs.push(m.st ? `${m.n}(${m.ps.map(lit).join(", ")})` : `${C}.${m.n}(${m.ps.map(lit).join(", ")})`);
+        return { code, noRun: true, ask: "Which call compiles?", askCode: `// in main (a different class):\n${mk}`,
+          out: [good + ";"], choices: [good + ";", ...shuffle(wrongs).slice(0, 2).map(w => w + ";")],
           tip: `Match the header exactly: ${m.ps.length} argument(s) of type ${m.ps.join(", ") || "(none)"}, called on ${m.st ? "the class name " + C : "an object like " + v}.` };
       },
     };
@@ -494,35 +544,38 @@ footer { margin-top: 22px; color: var(--dim); font-size: 14px; text-align: cente
       objects:    ["o_ctor", "o_two", "o_alias", "o_default", "o_shadow", "o_setter", "o_null"],
       static:     ["st_call", "st_count", "st_shared", "st_math", "st_target", "st_context"],
       returns:    ["r_ignored", "r_void", "r_voiderr", "r_both", "r_intdiv", "r_chain", "r_string"],
-      signatures: ["g_sig", "g_sig", "g_sig", "g_sig", "g_sig"],
+      signatures: ["g_sig"],
     };
-    TOPICS.mixed = [].concat(TOPICS.objects, TOPICS.static, TOPICS.returns, TOPICS.signatures);
+    TOPICS.mixed = [].concat(TOPICS.objects, TOPICS.static, TOPICS.returns, Array(5).fill("g_sig"));
     const LABEL = { o: "objects", s: "static", r: "void / return", g: "signatures" };
 
+    const fmt = o => o.map(String).join("\n");
+    function bump(s, k) {              // nudge the first number to make an extra distractor
+      return s.replace(/-?\d+(\.\d+)?/, m => { const n = parseFloat(m) + k; return m.includes(".") ? jd(n) : String(n); });
+    }
     function generate(topic, forceKey) {
       const key = forceKey || pick(TOPICS[topic] || TOPICS.mixed);
       const q = T[key]();
       q.key = key; q.topic = LABEL[key[0]];
       q.out = q.out.map(String);
+      q.answer = fmt(q.out);
+      let opts = q.choices ? q.choices.map(String) : [q.answer];
+      if (!q.choices) {
+        for (const w of q.wrong || []) { const s = fmt(w); if (!opts.includes(s)) opts.push(s); }
+        for (const k of [1, -1, 2, 3, -2, 5]) {
+          if (opts.length >= 4) break;
+          const s = bump(q.answer, k); if (s !== q.answer && !opts.includes(s)) opts.push(s);
+        }
+        for (const s of ["error", ""]) if (opts.length < 4 && !opts.includes(s)) opts.push(s);
+        opts = [opts[0], ...shuffle(opts.slice(1)).slice(0, 3)];
+      }
+      q.options = shuffle(opts);
       return q;
     }
     return { generate, TOPICS, templates: Object.keys(T) };
   }
 
-  /* whitespace tokens: forgiving of iPad typing, strict on content */
-  function tokens(s, cs) {
-    let t = String(s).trim();
-    if (!cs) t = t.toLowerCase();
-    if (/^(nothing|none|\(nothing\))$/i.test(t) || t === "") return [];
-    return t.split(/\s+/);
-  }
-  function check(answer, out, cs) {
-    if (out.length === 1 && out[0] === "error") return /\b(error|exception|crash)/i.test(answer) || /^error$/i.test(String(answer).trim());
-    const a = tokens(answer, cs), b = out.join(" ").trim() === "" ? [] : out.join(" ").split(/\s+/).map(x => cs ? x : x.toLowerCase());
-    return a.length === b.length && a.every((x, i) => x === b[i]);
-  }
-
-  const api = { rng, make, check, tokens };
+  const api = { rng, make };
   if (typeof module !== "undefined") module.exports = api; else root.MethodDrills = api;
 })(this);
 </script>
@@ -531,7 +584,14 @@ footer { margin-top: 22px; color: var(--dim); font-size: 14px; text-align: cente
   var eng = MethodDrills.make(Math.random);
   var topic = "mixed", q = null, answered = false;
   var stats = { streak: 0, best: 0, right: 0, total: 0 };
-  try { stats.best = +localStorage.getItem("methodDrillsBest") || 0; } catch (e) {}
+  try { stats.best = +localStorage.getItem("methodQuizBest") || 0; } catch (e) {}
+  var SHAPES = [
+    '<polygon points="15,2 28,27 2,27"/>',
+    '<polygon points="15,1 29,15 15,29 1,15"/>',
+    '<circle cx="15" cy="15" r="13"/>',
+    '<rect x="3" y="3" width="24" height="24" rx="3"/>'
+  ];
+  var WORDS = { "static": 1, "instance": 1, "int": 1, "double": 1, "String": 1, "boolean": 1, "void": 1 };
 
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
   function colour(line) {
@@ -547,81 +607,70 @@ footer { margin-top: 22px; color: var(--dim); font-size: 14px; text-align: cente
     s = s.replace(/(^|[^\w"#.])(-?\d+(?:\.\d+)?)(?![\w"])/g, '$1<span class="nu">$2</span>');
     return s.replace(/\u0001("[^"]*")\u0002/g, '<span class="st">$1</span>');
   }
-  function lines(code) {
-    return code.split("\n").map(function (l, i) {
-      return '<div class="ln"><span class="num">' + (i + 1) + '</span><span>' + colour(l) + '</span></div>';
-    }).join("");
+  function label(opt) {
+    if (opt === "error") return { html: "\u26A0 Error", word: true };
+    if (opt === "") return { html: "(nothing prints)", word: true };
+    return { html: esc(opt), word: !!WORDS[opt] };
   }
   function render() {
     q = eng.generate(topic);
-    document.getElementById("code").innerHTML = lines(q.code);
+    document.getElementById("code").innerHTML = q.code.split("\n").map(function (l, i) {
+      return '<div class="ln"><span class="num">' + (i + 1) + '</span><span>' + colour(l) + '</span></div>';
+    }).join("");
     document.getElementById("topicTag").textContent = q.topic;
     document.getElementById("ask").textContent = q.ask || "What prints?";
     document.getElementById("askcode").innerHTML = q.askCode ? q.askCode.split("\n").map(colour).join("\n") : "";
-    var a = document.getElementById("answer"); a.value = ""; a.disabled = false;
-    a.placeholder = q.ask ? "Type your answer." : "Type exactly what prints.\nOne value per line.\nWon't compile or crashes? Type: error";
-    document.getElementById("answerPanel").className = "panel answer-panel";
+    var tiles = document.getElementById("tiles");
+    tiles.innerHTML = q.options.map(function (opt, i) {
+      var l = label(opt);
+      return '<button class="tile t' + i + '" data-i="' + i + '"><span class="key">' + (i + 1) + '</span>' +
+        '<svg class="shape" viewBox="0 0 30 30" aria-hidden="true">' + SHAPES[i] + '</svg>' +
+        '<span class="txt' + (l.word ? " word" : "") + '">' + l.html + '</span><span class="mark"></span></button>';
+    }).join("");
+    Array.prototype.forEach.call(tiles.querySelectorAll(".tile"), function (b) {
+      b.onclick = function () { choose(+b.getAttribute("data-i")); };
+    });
     document.getElementById("feedback").className = "feedback";
-    document.getElementById("check").disabled = false;
-    document.getElementById("error").disabled = false;
-    document.getElementById("outLabel").textContent = q.ask ? "Answer" : "Terminal";
     answered = false;
   }
   function paint() {
     document.getElementById("streak").textContent = stats.streak;
     document.getElementById("best").textContent = stats.best;
     document.getElementById("tally").textContent = stats.right + "/" + stats.total;
-    document.getElementById("streakChip").className = "chip" + (stats.streak >= 5 ? " hot" : "");
+    document.getElementById("streakChip").className = "sticky" + (stats.streak >= 5 ? " hot" : "");
   }
-  function check() {
-    if (answered) return;
-    var given = document.getElementById("answer").value;
-    if (!given.trim()) { document.getElementById("answer").focus(); return; }
+  function choose(i) {
+    if (answered || !q.options[i] && q.options[i] !== "") return;
     answered = true;
-    var ok = MethodDrills.check(given, q.out, q.cs);
+    var ok = q.options[i] === q.answer;
     stats.total++;
     if (ok) { stats.right++; stats.streak++; if (stats.streak > stats.best) stats.best = stats.streak; }
     else stats.streak = 0;
-    try { localStorage.setItem("methodDrillsBest", stats.best); } catch (e) {}
+    try { localStorage.setItem("methodQuizBest", stats.best); } catch (e) {}
     paint();
 
-    var v = document.getElementById("verdict");
-    v.textContent = ok ? "Correct" + (stats.streak >= 3 ? " \u2014 " + stats.streak + " in a row" : "")
-                       : (q.ask ? "Not quite \u2014 here's the answer" : "Not quite \u2014 here's what really happens");
-    v.className = "verdict " + (ok ? "right" : "wrong");
-    document.getElementById("answerPanel").className = "panel answer-panel " + (ok ? "right" : "wrong");
-
-    var html;
-    if (q.out.length === 1 && q.out[0] === "error") {
-      html = '<span class="err">' + esc(q.show || "error") + "</span>";
-    } else {
-      var norm = function (x) { return q.cs ? x : x.toLowerCase(); };
-      var mine = MethodDrills.tokens(given, q.cs), real = q.out.join(" ").split(/\s+/);
-      var firstBad = -1;
-      for (var i = 0; i < Math.max(mine.length, real.length); i++) {
-        if ((mine[i] || "") !== norm(real[i] || "")) { firstBad = i; break; }
-      }
-      var n = 0;
-      html = q.out.map(function (line) {
-        return line.split(" ").map(function (tok) {
-          var cls = (!ok && n === firstBad) ? ' class="miss"' : ""; n++;
-          return "<span" + cls + ">" + esc(tok) + "</span>";
-        }).join(" ");
-      }).join("\n");
-    }
-    document.getElementById("out").innerHTML = html;
-    document.getElementById("tip").innerHTML = "<b>Why</b>" + esc(q.tip);
+    Array.prototype.forEach.call(document.querySelectorAll(".tile"), function (b, j) {
+      b.disabled = true;
+      var isRight = q.options[j] === q.answer;
+      if (isRight) { b.classList.add("correct"); b.querySelector(".mark").textContent = "\u2713"; }
+      else if (j === i) { b.classList.add("picked", "wrongpick"); b.querySelector(".mark").textContent = "\u2717"; }
+      else b.classList.add("dim");
+    });
+    var ban = document.getElementById("banner");
+    ban.textContent = ok ? (stats.streak >= 3 ? "Correct! " + stats.streak + " in a row" : "Correct!") : "Not quite";
+    ban.className = "banner " + (ok ? "right" : "wrong");
+    var em = document.getElementById("errmsg");
+    if (q.show) { em.hidden = false; em.textContent = q.show; } else em.hidden = true;
+    document.getElementById("tip").textContent = q.tip;
     document.getElementById("feedback").className = "feedback show";
-    document.getElementById("check").disabled = true;
-    document.getElementById("error").disabled = true;
-    document.getElementById("answer").disabled = true;
+    document.getElementById("next").focus({ preventScroll: true });
+    document.getElementById("feedback").scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
-  document.getElementById("check").onclick = check;
-  document.getElementById("next").onclick = render;
-  document.getElementById("error").onclick = function () { document.getElementById("answer").value = "error"; check(); };
+  document.getElementById("next").onclick = function () { render(); window.scrollTo({ top: 0, behavior: "smooth" }); };
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); answered ? render() : check(); }
+    if (!answered && /^[1-4]$/.test(e.key) && +e.key <= q.options.length) { choose(+e.key - 1); }
+    else if (answered && (e.key === "Enter" || e.key === " ") && document.activeElement.id !== "next") { e.preventDefault(); render(); }
   });
   Array.prototype.forEach.call(document.querySelectorAll("#topics button"), function (b) {
     b.onclick = function () {
