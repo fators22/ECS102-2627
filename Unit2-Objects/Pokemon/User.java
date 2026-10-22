@@ -10,6 +10,8 @@ public class User extends Actor
     {
         this.name = name;
         this.pokemon = null;
+        GreenfootImage img= new GreenfootImage( name.toUpperCase()+" ", 28, Color.WHITE, Color.BLUE);
+        this.setImage(img);
     }
 
     public void setPokemon(Pokemon p)

@@ -17,22 +17,35 @@ public class Account {
     public void setUserName(String u){
          username=u;
     }
+    public Account(String requestedName)
+{
+    if(isAvailable(requestedName))
+    {
+        username = requestedName;
+    }
+    else
+    {
+        int n = 1;
+
+        while( ! isAvailable(requestedName + n) )
+            n++;
+
+        username = requestedName + n;
+    }
+}
 
     public String getShortenedName()
     {
+        String shortname = username;
 
-    String shortname = username;
-
-    while (shortname.indexOf("-") != -1)
-    {
-        int index = shortname.indexOf("-");
-       shortname= shortname.substring(0, index - 1)+
-                    shortname.substring(index +1);
-        
-       
-    }
-    return shortname;
-}
+        while (shortname.indexOf("-") != -1)
+        {
+            int index = shortname.indexOf("-");
+        shortname= shortname.substring(0, index - 1)+
+                        shortname.substring(index +1);     
+        }
+        return shortname;
+   }
  public static void main(String[] args){
     Account a = new Account();
     a.setUserName("PSmith");
