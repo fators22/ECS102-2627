@@ -1,7 +1,21 @@
 public class Account {
     private String username;
+    public Acccount(String requestedName){
+        if(isAvaliable(requestedName)){
+            this,username=requestedName
+        }else{
+            int count=1;
+            while(!isAvaliable(requestedName+count)){
+                count++;
+            }
+            this.username=requestedName+count;
+        }
+            
+    }
+
+    
     public void setUserName(String u){
-username=u;
+         username=u;
     }
 
     public String getShortenedName()
