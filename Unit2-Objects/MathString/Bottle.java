@@ -1,19 +1,33 @@
-public class Bottle{
-   private double amountLeft;
-   private double capacity;
+/**
+ * Bottle
+ * _______________
+ *   -capacity:double
+ *   -amtLeft:double
+ * ___________________
+ * +Bottle(cap:double)
+ * +updateAmount(amt:double):double
+ * ___________________________________
+ * 
+ * Bottle
+ */
 
-   public Bottle(double capacity)
-   {
-        this.capacity=capacity;
-        this.amountLeft=capacity;
-   }
 
-   public double updateAmount(double amt){
-    amountLeft-=amt;
-    if(amountLeft*4<capacity){
-         amountLeft=capacity;
+public class Bottle {
+    private double capacity;
+    private double amtLeft;
+
+    public Bottle(double cap){
+        capacity=cap;
+        amtLeft=cap;
     }
-    return amountLeft;
-   }
+    public double updateAmount(double amt){
+        amtLeft-=amt;
+        if(amtLeft<0.25*capacity){
+            amtLeft=capacity;
+        }
+        return amtLeft;
 
+    }
+   
+    
 }
