@@ -18,7 +18,7 @@ public class SimpleServer {
     public void acceptClient()throws Exception {
         socket=serverSocket.accept();
         in=new Scanner(socket.getInputStream());
-        out=new PrintWriter(socket.getOutputStream());
+        out=new PrintWriter(socket.getOutputStream(), true);
     }
     public String receiveMessage(){
         return in.nextLine();
@@ -26,6 +26,7 @@ public class SimpleServer {
     }
     public void sendMessage(String msg){
         out.println(msg);
+        out.flush();
     }
     public void close() throws Exception{
         serverSocket.close();
