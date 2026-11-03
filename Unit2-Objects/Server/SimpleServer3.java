@@ -1,17 +1,19 @@
-package Server;
+
+
+
 
 import java.util.*;
 import java.io.*;
 import java.net.*;
 
 
-public class SimpleServer {
+public class SimpleServer3 {
     private ServerSocket serverSocket;
     private Socket socket;
     private PrintWriter out;
     private Scanner in;
 
-    public SimpleServer(int port) throws Exception{
+    public SimpleServer3(int port) throws Exception{
         serverSocket=new ServerSocket(port);
 
     }
@@ -35,7 +37,7 @@ public class SimpleServer {
         out.close();
     }
     public static void main(String[] args) throws Exception{
-        SimpleServer smp = new SimpleServer(9090);
+        SimpleServer3 smp = new SimpleServer3(9090);
         smp.acceptClient();
         Scanner input=new Scanner(System.in);
         while(true){
