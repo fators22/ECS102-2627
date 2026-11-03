@@ -36,10 +36,13 @@ public class SimpleServer {
     public static void main(String[] args) throws Exception{
         SimpleServer smp = new SimpleServer(9090);
         smp.acceptClient();
+        Scanner input=new Scanner(System.in);
         while(true){
-            smp.sendMessage("hello");
+            String message=input.nextLine();
+            smp.sendMessage(message);
+           // smp.sendMessage("hello");
             String msg=smp.receiveMessage();
-            System.out.print("Reply  "+msg);
+            System.out.print("Client  "+msg);
             if(msg.equals("stop")){
                  break;
             }
