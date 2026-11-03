@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ECS 102: Introduction to Computing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  /* ============ CONFIG IS IN THE <script> AT THE BOTTOM ============ */
+  :root {
+    --bg: #EDF1F5;
+    --paper: #FFFFFF;
+    --ink: #1B2A41;
+    --muted: #5B6B80;
+    --line: #D3DCE6;
+    --accent: #0F6E6E;
+    --accent-soft: #DCEFEE;
+    --file: #A86A0A;
+    --grid: rgba(27, 42, 65, 0.05);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #121A24;
+      --paper: #1A2431;
+      --ink: #E4EAF1;
+      --muted: #93A3B6;
+      --line: #2C3A4B;
+      --accent: #4FC4C0;
+      --accent-soft: #17393D;
+      --file: #E3AA4E;
+      --grid: rgba(228, 234, 241, 0.04);
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0;
+    padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px);
+    background-color: var(--bg);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 24px 24px;
+    color: var(--ink);
+    font: 400 17px/1.6 "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  a { color: var(--accent); }
+  a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible {
+    outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 20px; }
+  code, .mono { font-family: "JetBrains Mono", ui-monospace, Consolas, monospace; }
+
+  /* Header */
+  header { padding: 56px 0 32px; }
+  .course-code {
+    font: 600 clamp(56px, 12vw, 120px)/0.9 "JetBrains Mono", ui-monospace, monospace;
+    letter-spacing: -0.04em;
+    margin: 0;
+  }
+  .course-code .semi { color: var(--accent); }
+  h1.title { font-size: clamp(24px, 4vw, 34px); font-weight: 600; margin: 12px 0 4px; }
+  .credit { color: var(--muted); margin: 0 0 20px; }
+  .intro { max-width: 64ch; margin: 0; }
+
+  section { margin: 40px 0; }
+  h2 { font-size: 22px; font-weight: 600; margin: 0 0 16px; }
+
+  /* Tech stack */
+  .stack { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 0; list-style: none; }
+  .stack li {
+    background: var(--paper); border: 1px solid var(--line);
+    padding: 6px 12px; border-radius: 6px; font-size: 15px;
+  }
+  .stack b { font-weight: 600; }
+
+  /* Unit track — a real sequence, so numbered */
+  .part { margin-bottom: 28px; }
+  .part h3 { font-size: 16px; color: var(--muted); font-weight: 500; margin: 0 0 10px; }
+  .units { list-style: none; margin: 0; padding: 0; border-left: 3px solid var(--line); }
+  .unit {
+    display: grid; grid-template-columns: 52px 1fr; gap: 4px 12px;
+    padding: 12px 16px 12px 0; position: relative;
+  }
+  .unit .num {
+    font: 600 28px/1 "JetBrains Mono", ui-monospace, monospace;
+    color: var(--muted); text-align: center; padding-top: 2px;
+  }
+  .unit.has-work .num { color: var(--accent); }
+  .unit.has-work::before {
+    content: ""; position: absolute; left: -3px; top: 12px; bottom: 12px;
+    width: 3px; background: var(--accent);
+  }
+  .unit h4 { margin: 0; font-size: 18px; font-weight: 600; }
+  .unit p { margin: 2px 0 0; color: var(--muted); font-size: 15px; }
+  .unit .status { grid-column: 2; font-size: 14px; margin-top: 4px; }
+  .unit .status a { font-weight: 500; }
+  .unit .status .none { color: var(--muted); font-style: italic; }
+
+  /* Explorer */
+  .explorer {
+    background: var(--paper); border: 1px solid var(--line); border-radius: 10px;
+    overflow: hidden;
+  }
+  .toolbar {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    padding: 12px 14px; border-bottom: 1px solid var(--line);
+  }
+  .toolbar input[type=search] {
+    flex: 1 1 220px; font: inherit; font-size: 16px;
+    padding: 8px 12px; border: 1px solid var(--line); border-radius: 6px;
+    background: var(--bg); color: var(--ink);
+  }
+  .toolbar label { font-size: 14px; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+  .toolbar button {
+    font: inherit; font-size: 14px; padding: 7px 12px; border-radius: 6px;
+    border: 1px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer;
+  }
+  .meta { padding: 8px 14px; font-size: 14px; color: var(--muted); border-bottom: 1px solid var(--line); }
+  .tree { padding: 8px 6px 14px; overflow-x: auto; font-size: 15px; }
+  .tree ul { list-style: none; margin: 0; padding-left: 20px; }
+  .tree > ul { padding-left: 4px; }
+  .tree li { white-space: nowrap; }
+  .tree summary {
+    cursor: pointer; padding: 3px 6px; border-radius: 4px; list-style: none;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .tree summary::-webkit-details-marker { display: none; }
+  .tree summary::before {
+    content: "▸"; width: 12px; color: var(--muted); transition: transform .12s;
+  }
+  .tree details[open] > summary::before { transform: rotate(90deg); }
+  .tree summary:hover, .tree .file:hover { background: var(--accent-soft); }
+  .tree .dir-name { font-weight: 600; }
+  .tree .count { color: var(--muted); font-size: 13px; }
+  .tree .file {
+    display: flex; align-items: center; gap: 8px; padding: 3px 6px 3px 26px; border-radius: 4px;
+  }
+  .tree .file a { color: var(--ink); text-decoration: none; }
+  .tree .file a:hover { text-decoration: underline; }
+  .tree .ext { color: var(--file); font-size: 12px; font-weight: 600; min-width: 38px; }
+  .tree .live { font-size: 13px; }
+  .tree .size { color: var(--muted); font-size: 12px; margin-left: auto; padding-left: 16px; }
+  .msg { padding: 24px 16px; color: var(--muted); }
+  .msg.error { color: #B3261E; }
+  @media (prefers-color-scheme: dark) { .msg.error { color: #FF8A80; } }
+  mark { background: var(--accent-soft); color: inherit; padding: 0 1px; border-radius: 2px; }
+
+  /* Getting started */
+  pre {
+    background: var(--paper); border: 1px solid var(--line); border-radius: 8px;
+    padding: 14px 16px; overflow-x: auto; font-size: 14px; margin: 8px 0 16px;
+  }
+  .steps { padding-left: 22px; max-width: 70ch; }
+  .steps li { margin-bottom: 6px; }
+
+  .integrity {
+    border-left: 4px solid var(--file); background: var(--paper);
+    padding: 14px 18px; border-radius: 0 8px 8px 0; max-width: 70ch;
+  }
+  .integrity h2 { font-size: 18px; margin-bottom: 6px; }
+  .integrity p { margin: 0; }
+
+  footer { padding: 24px 0 48px; color: var(--muted); font-size: 15px; border-top: 1px solid var(--line); margin-top: 48px; }
+
+  @media (max-width: 560px) {
+    body { font-size: 16px; }
+    .unit { grid-template-columns: 40px 1fr; }
+    .unit .num { font-size: 22px; }
+    .tree .size { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="course-code" aria-hidden="true">ECS102<span class="semi">;</span></p>
+    <h1 class="title">ECS 102: Introduction to Computing</h1>
+    <p class="credit">SUPA credit course</p>
+    <p class="intro">This repository houses my coursework, lab projects, and final applications built with Java and VS Code. The curriculum moves from foundational software design to data structures, and ends with full-stack enterprise development.</p>
+  </header>
+
+  <section aria-labelledby="stack-h">
+    <h2 id="stack-h">Tech stack and environment</h2>
+    <ul class="stack">
+      <li><b>Language:</b> Java (JDK 17+)</li>
+      <li><b>IDE:</b> VS Code</li>
+      <li><b>Graphics:</b> Greenfoot (Unit 2)</li>
+      <li><b>Backend:</b> Spring Boot (Unit 9)</li>
+      <li><b>Database:</b> <span id="db-name">H2 / MySQL / PostgreSQL</span> (Unit 9)</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="units-h">
+    <h2 id="units-h">Curriculum and units</h2>
+    <div id="units"></div>
+  </section>
+
+  <section aria-labelledby="files-h">
+    <h2 id="files-h">Browse the repository</h2>
+    <div class="explorer">
+      <div class="toolbar">
+        <input type="search" id="search" placeholder="Find a file, e.g. Main.java" aria-label="Find a file">
+        <label><input type="checkbox" id="showHidden"> Show hidden files</label>
+        <button type="button" id="expandAll">Expand all</button>
+        <button type="button" id="collapseAll">Collapse all</button>
+      </div>
+      <div class="meta" id="meta">Loading files…</div>
+      <div class="tree" id="tree" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="start-h">
+    <h2 id="start-h">Getting started locally</h2>
+    <p><b>Prerequisites:</b> the Java Extension Pack in VS Code and a configured JDK.</p>
+    <p><b>Standard units</b></p>
+    <pre><code id="clone-cmd">git clone https://github.com/fators22/ECS102.git
+cd ECS102</code></pre>
+    <ol class="steps">
+      <li>Open the unit folder in VS Code.</li>
+      <li>Open <code>Main.java</code>.</li>
+      <li>Select <b>Run</b> above the <code>main</code> method.</li>
+    </ol>
+    <p><b>Unit 9 Spring Boot application</b></p>
+    <pre><code>cd Unit9_SpringBootApp
+./mvnw spring-boot:run</code></pre>
+  </section>
+
+  <section class="integrity" aria-labelledby="ai-h">
+    <h2 id="ai-h">Academic integrity</h2>
+    <p>This repository is a personal portfolio of my software engineering growth. If you are taking ECS 102 now, copying this code violates academic integrity rules. Use it only for conceptual guidance and reference.</p>
+  </section>
+
+  <footer>
+    Maintained by <span id="maintainer">[Your Name]</span> · <a id="repo-link" href="#">View on GitHub</a>
+  </footer>
+</div>
+
+<script>
+/* ======================= CONFIG — EDIT THESE ======================= */
+const CONFIG = {
+  owner: "fators22",          // GitHub username (auto-detected on GitHub Pages)
+  repo: "ECS102",             // Repository name (auto-detected on GitHub Pages)
+  branch: "",                 // Leave blank to use the repo's default branch
+  maintainer: "[Your Name]",
+  database: "H2 / MySQL / PostgreSQL"
+};
+/* =================================================================== */
+
+const UNITS = [
+  { part: "Part 1: Core fundamentals and OOP", items: [
+    [1, "Java syntax and primitive types", "Variables, data types, arithmetic expressions, and console I/O."],
+    [2, "Using objects with Greenfoot and class design", "Object-oriented principles, visual simulations, state, behavior, and custom classes."],
+    [3, "Algorithms with conditionals, loops, and file I/O", "Boolean logic, for and while loops, data streams, and parsing files."]
+  ]},
+  { part: "Part 2: Linear data structures and logic", items: [
+    [4, "ArrayLists and String methods", "Dynamic arrays, text manipulation, and sequential data handling."],
+    [5, "Inheritance and polymorphism", "Class hierarchies, overriding, abstract classes, and interfaces."],
+    [6, "Multidimensional arrays and algorithms", "Matrix manipulation, grid-based logic, and nested loop traversal."]
+  ]},
+  { part: "Part 3: Advanced structures and full-stack development", items: [
+    [7, "Linked lists, stacks, and queues", "Custom reference-based structures and FIFO/LIFO abstract data types."],
+    [8, "Recursion, searching, and sorting", "Divide-and-conquer, binary search, and merge, quick, selection, and insertion sort."],
+    [9, "Full-stack development with Spring Boot and databases", "REST APIs, MVC architecture, and database persistence."]
+  ]}
+];
+
+// Auto-detect owner/repo when hosted at https://<owner>.github.io/<repo>/
+(function detect() {
+  const host = location.hostname;
+  if (host.endsWith(".github.io")) {
+    CONFIG.owner = host.split(".")[0];
+    const first = location.pathname.split("/").filter(Boolean)[0];
+    CONFIG.repo = first || `${CONFIG.owner}.github.io`;
+  }
+})();
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => s.replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const repoUrl = `https://github.com/${CONFIG.owner}/${CONFIG.repo}`;
+const pagesBase = `https://${CONFIG.owner}.github.io/${CONFIG.repo === CONFIG.owner + ".github.io" ? "" : CONFIG.repo + "/"}`;
+
+$("maintainer").textContent = CONFIG.maintainer;
+$("db-name").textContent = CONFIG.database;
+$("repo-link").href = repoUrl;
+$("clone-cmd").textContent = `git clone ${repoUrl}.git\ncd ${CONFIG.repo}`;
+
+let allItems = [];   // flat list from the GitHub API
+let branch = CONFIG.branch;
+
+function fmtSize(b) {
+  if (b == null) return "";
+  if (b < 1024) return b + " B";
+  if (b < 1048576) return (b / 1024).toFixed(1) + " KB";
+  return (b / 1048576).toFixed(1) + " MB";
+}
+function isHidden(path) { return path.split("/").some(p => p.startsWith(".")); }
+function unitNumber(name) {
+  const m = name.match(/unit[\s_\-]*0?(\d+)/i);
+  return m ? parseInt(m[1], 10) : null;
+}
+
+async function api(url) {
+  const res = await fetch(url, { headers: { Accept: "application/vnd.github+json" } });
+  if (res.status === 403 || res.status === 429) throw new Error("GitHub's hourly request limit was reached. Wait a few minutes and reload.");
+  if (res.status === 404) throw new Error(`Repository ${CONFIG.owner}/${CONFIG.repo} was not found, or it is private. Make the repo public or fix CONFIG at the bottom of index.html.`);
+  if (!res.ok) throw new Error(`GitHub returned an error (${res.status}).`);
+  return res.json();
+}
+
+async function loadTree() {
+  const cacheKey = `tree:${CONFIG.owner}/${CONFIG.repo}`;
+  try {
+    const cached = JSON.parse(sessionStorage.getItem(cacheKey) || "null");
+    if (cached && Date.now() - cached.t < 5 * 60 * 1000) return cached;
+  } catch (e) {}
+  if (!branch) branch = (await api(`https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}`)).default_branch;
+  const data = await api(`https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`);
+  const out = { t: Date.now(), branch, items: data.tree, truncated: data.truncated };
+  try { sessionStorage.setItem(cacheKey, JSON.stringify(out)); } catch (e) {}
+  return out;
+}
+
+function buildNested(items) {
+  const root = { dirs: {}, files: [] };
+  for (const it of items) {
+    const parts = it.path.split("/");
+    let node = root;
+    const last = parts.length - 1;
+    parts.forEach((p, i) => {
+      if (i === last && it.type === "blob") { node.files.push({ name: p, ...it }); return; }
+      if (i === last && it.type !== "tree") return; // skip submodules
+      node.dirs[p] = node.dirs[p] || { dirs: {}, files: [], path: parts.slice(0, i + 1).join("/") };
+      node = node.dirs[p];
+    });
+  }
+  return root;
+}
+function countFiles(node) {
+  return node.files.length + Object.values(node.dirs).reduce((n, d) => n + countFiles(d), 0);
+}
+const natural = (a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" });
+
+function fileRow(f, label) {
+  const ext = f.name.includes(".") ? f.name.split(".").pop().toLowerCase() : "";
+  const href = `${repoUrl}/blob/${branch}/${f.path.split("/").map(encodeURIComponent).join("/")}`;
+  const live = (ext === "html" || ext === "htm")
+    ? ` <a class="live" href="${pagesBase}${f.path.split("/").map(encodeURIComponent).join("/")}">Open page</a>` : "";
+  return `<li class="file"><span class="ext mono">${esc(ext || "file")}</span>
+    <a href="${href}" class="mono">${label || esc(f.name)}</a>${live}
+    <span class="size mono">${fmtSize(f.size)}</span></li>`;
+}
+
+function renderNode(node, depth) {
+  let html = "<ul>";
+  for (const name of Object.keys(node.dirs).sort(natural)) {
+    const d = node.dirs[name];
+    const href = `${repoUrl}/tree/${branch}/${d.path.split("/").map(encodeURIComponent).join("/")}`;
+    html += `<li><details${depth === 0 ? "" : ""} id="dir-${esc(d.path)}">
+      <summary><span class="dir-name mono">${esc(name)}/</span>
+      <span class="count">${countFiles(d)} files</span>
+      <a href="${href}" class="count" onclick="event.stopPropagation()">GitHub</a></summary>
+      ${renderNode(d, depth + 1)}</details></li>`;
+  }
+  for (const f of node.files.sort((a, b) => natural(a.name, b.name))) html += fileRow(f);
+  return html + "</ul>";
+}
+
+function visibleItems() {
+  return $("showHidden").checked ? allItems : allItems.filter(i => !isHidden(i.path));
+}
+
+function render() {
+  const q = $("search").value.trim().toLowerCase();
+  const items = visibleItems();
+  const files = items.filter(i => i.type === "blob");
+  if (q) {
+    const hits = files.filter(f => f.path.toLowerCase().includes(q)).sort((a, b) => natural(a.path, b.path));
+    $("meta").textContent = `${hits.length} of ${files.length} files match "${$("search").value.trim()}"`;
+    if (!hits.length) { $("tree").innerHTML = `<p class="msg">No files match. Try part of a file name, like "Main" or ".java".</p>`; return; }
+    const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "ig");
+    $("tree").innerHTML = "<ul>" + hits.map(f =>
+      fileRow({ ...f, name: f.path.split("/").pop() }, esc(f.path).replace(re, m => `<mark>${m}</mark>`))
+    ).join("") + "</ul>";
+    return;
+  }
+  const folders = items.filter(i => i.type === "tree").length;
+  $("meta").textContent = `${files.length} files in ${folders} folders · branch ${branch}`;
+  $("tree").innerHTML = files.length ? renderNode(buildNested(items), 0)
+    : `<p class="msg">This repository has no files yet. Push a unit folder to see it here.</p>`;
+}
+
+function renderUnits() {
+  // Map unit number -> top-level folder path(s)
+  const found = {};
+  allItems.filter(i => i.type === "tree" && !i.path.includes("/")).forEach(d => {
+    const n = unitNumber(d.path);
+    if (n) (found[n] = found[n] || []).push(d.path);
+  });
+  $("units").innerHTML = UNITS.map(p => `
+    <div class="part"><h3>${esc(p.part)}</h3><ol class="units">
+      ${p.items.map(([n, title, desc]) => {
+        const dirs = found[n] || [];
+        const status = !allItems.length ? "" : dirs.length
+          ? dirs.map(d => `<a href="#dir-${esc(d)}" data-dir="${esc(d)}">Open ${esc(d)}/</a>`).join(" &nbsp; ")
+          : `<span class="none">No folder yet</span>`;
+        return `<li class="unit${dirs.length ? " has-work" : ""}">
+          <span class="num" aria-hidden="true">${n}</span>
+          <div><h4>Unit ${n}: ${esc(title)}</h4><p>${esc(desc)}</p></div>
+          <div class="status">${status}</div></li>`;
+      }).join("")}
+    </ol></div>`).join("");
+}
+
+// Clicking a unit link opens that folder in the explorer
+$("units").addEventListener("click", (e) => {
+  const a = e.target.closest("a[data-dir]");
+  if (!a) return;
+  $("search").value = ""; render();
+  const el = document.getElementById("dir-" + a.dataset.dir);
+  if (el) { el.open = true; }
+});
+$("search").addEventListener("input", render);
+$("showHidden").addEventListener("change", render);
+$("expandAll").addEventListener("click", () => document.querySelectorAll("#tree details").forEach(d => d.open = true));
+$("collapseAll").addEventListener("click", () => document.querySelectorAll("#tree details").forEach(d => d.open = false));
+
+renderUnits();
+loadTree().then(data => {
+  branch = data.branch;
+  allItems = data.items;
+  renderUnits();
+  render();
+  if (data.truncated) $("meta").textContent += " · list truncated by GitHub (very large repo)";
+}).catch(err => {
+  $("meta").textContent = "Files could not be loaded.";
+  $("tree").innerHTML = `<p class="msg error">${esc(err.message)}</p>`;
+});
+</script>
+</body>
+</html>
