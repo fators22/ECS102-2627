@@ -99,7 +99,13 @@
   .unit p { margin: 2px 0 0; color: var(--muted); font-size: 15px; }
   .unit .status { grid-column: 2; font-size: 14px; margin-top: 4px; }
   .unit .status a { font-weight: 500; }
-  .unit .status .none { color: var(--muted); font-style: italic; }
+  .unit .status .none { color: var(--muted); font-style: italic; margin-left: 8px; }
+  .projects { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .chip {
+    font-size: 13px; padding: 3px 10px; border-radius: 999px; text-decoration: none;
+    background: var(--accent-soft); color: var(--ink); border: 1px solid var(--line);
+  }
+  .chip:hover { border-color: var(--accent); }
 
   /* Explorer */
   .explorer {
@@ -207,6 +213,7 @@
     <div class="explorer">
       <div class="toolbar">
         <input type="search" id="search" placeholder="Find a file, e.g. Main.java" aria-label="Find a file">
+        <label><input type="checkbox" id="showClass"> Show .class files</label>
         <label><input type="checkbox" id="showHidden"> Show hidden files</label>
         <button type="button" id="expandAll">Expand all</button>
         <button type="button" id="collapseAll">Collapse all</button>
@@ -245,8 +252,8 @@ cd ECS102</code></pre>
 <script>
 /* ======================= CONFIG — EDIT THESE ======================= */
 const CONFIG = {
-  owner: "fators22",          // GitHub username (auto-detected on GitHub Pages)
-  repo: "ECS102",             // Repository name (auto-detected on GitHub Pages)
+  owner: "fatmao",            // GitHub username or org that owns the repo (auto-detected on GitHub Pages)
+  repo: "ECS102-2627",        // Repository name (auto-detected on GitHub Pages)
   branch: "",                 // Leave blank to use the repo's default branch
   maintainer: "[Your Name]",
   database: "H2 / MySQL / PostgreSQL"
@@ -362,7 +369,7 @@ function renderNode(node, depth) {
   for (const name of Object.keys(node.dirs).sort(natural)) {
     const d = node.dirs[name];
     const href = `${repoUrl}/tree/${branch}/${d.path.split("/").map(encodeURIComponent).join("/")}`;
-    html += `<li><details${depth === 0 ? "" : ""} id="dir-${esc(d.path)}">
+    html += `<li><details id="${dirId(d.path)}">
       <summary><span class="dir-name mono">${esc(name)}/</span>
       <span class="count">${countFiles(d)} files</span>
       <a href="${href}" class="count" onclick="event.stopPropagation()">GitHub</a></summary>
@@ -373,8 +380,12 @@ function renderNode(node, depth) {
 }
 
 function visibleItems() {
-  return $("showHidden").checked ? allItems : allItems.filter(i => !isHidden(i.path));
+  return allItems.filter(i =>
+    ($("showHidden").checked || !isHidden(i.path)) &&
+    ($("showClass").checked || !(i.type === "blob" && /\.class$/i.test(i.path))));
 }
+// Folder names like "Unit1 - Primitive Types" contain spaces, so build a safe id
+const dirId = (path) => "dir-" + path.replace(/[^A-Za-z0-9_-]/g, "_");
 
 function render() {
   const q = $("search").value.trim().toLowerCase();
@@ -408,7 +419,16 @@ function renderUnits() {
       ${p.items.map(([n, title, desc]) => {
         const dirs = found[n] || [];
         const status = !allItems.length ? "" : dirs.length
-          ? dirs.map(d => `<a href="#dir-${esc(d)}" data-dir="${esc(d)}">Open ${esc(d)}/</a>`).join(" &nbsp; ")
+          ? dirs.map(d => {
+              const projects = allItems
+                .filter(i => i.type === "tree" && i.path.startsWith(d + "/") && !i.path.slice(d.length + 1).includes("/"))
+                .map(i => i.path).sort(natural);
+              const files = allItems.filter(i => i.type === "blob" && /\.java$/i.test(i.path) && i.path.startsWith(d + "/")).length;
+              return `<a href="#files-h" data-dir="${esc(d)}">Open ${esc(d)}/</a>
+                <span class="none">${files} .java files</span>
+                ${projects.length ? `<div class="projects">${projects.map(p =>
+                  `<a href="#files-h" class="chip mono" data-dir="${esc(p)}">${esc(p.split("/").pop())}</a>`).join("")}</div>` : ""}`;
+            }).join("<br>")
           : `<span class="none">No folder yet</span>`;
         return `<li class="unit${dirs.length ? " has-work" : ""}">
           <span class="num" aria-hidden="true">${n}</span>
@@ -422,12 +442,23 @@ function renderUnits() {
 $("units").addEventListener("click", (e) => {
   const a = e.target.closest("a[data-dir]");
   if (!a) return;
+  e.preventDefault();
   $("search").value = ""; render();
-  const el = document.getElementById("dir-" + a.dataset.dir);
-  if (el) { el.open = true; }
+  const parts = a.dataset.dir.split("/");
+  let el = null;
+  parts.forEach((_, i) => {
+    el = document.getElementById(dirId(parts.slice(0, i + 1).join("/")));
+    if (el) el.open = true;
+  });
+  if (el) {
+    el.open = true;
+    el.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+    el.querySelector("summary").focus({ preventScroll: true });
+  }
 });
 $("search").addEventListener("input", render);
 $("showHidden").addEventListener("change", render);
+$("showClass").addEventListener("change", render);
 $("expandAll").addEventListener("click", () => document.querySelectorAll("#tree details").forEach(d => d.open = true));
 $("collapseAll").addEventListener("click", () => document.querySelectorAll("#tree details").forEach(d => d.open = false));
 
