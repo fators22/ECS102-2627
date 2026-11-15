@@ -30,28 +30,11 @@ public class PriceFeed
         first = true;
     }
 
-    /** Next line as "PRICE TICK_CHANGE". */
-    public String readLine() throws Exception
-    {
-        if (!first)
-        {
-            Thread.sleep(POLL_MS);
-        }
-
-        double price = fetchPrice();
-        double change = 0.0;
-        if (!first)
-        {
-            change = price - lastPrice;
-        }
-        first = false;
-        lastPrice = price;
-        return String.format(Locale.US, "%.2f %+.2f", price, change);
-    }
+  
 
     // Finnhub response: {"c":189.84,"d":1.2,"dp":0.63,...}
     // c (current price) is always the first value, so read only up to the first comma
-    private double fetchPrice() throws Exception
+    public double fetchPrice() throws Exception
     {
         String url = "https://finnhub.io/api/v1/quote?symbol=" + symbol + "&token=" + API_KEY;
         String data = readUrl(url);
