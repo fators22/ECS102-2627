@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Java File Reading Drill</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --page: #E9EEF5;
+  --ink: #18213A;
+  --muted: #4E5A75;
+  --panel: #1B2440;
+  --panel-ink: #E6ECF8;
+  --comment: #8FA3C8;
+  --kw: #9CC3FF;
+  --field: #FFE27A;
+  --field-ink: #1B2440;
+  --ok: #1E9A74;
+  --ok-bg: #C9F2E2;
+  --bad: #C93C3C;
+  --bad-bg: #FBD3D3;
+  --line: #C7D0DF;
+  --file-bg: #FFFFFF;
+  --btn: #1B2440;
+  --btn-ink: #FFFFFF;
+  --code-size: 20px;
+  color-scheme: light;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #10162A;
+    --ink: #E3E9F5;
+    --muted: #9AA7C2;
+    --panel: #0A0F1F;
+    --panel-ink: #E6ECF8;
+    --comment: #7F93B8;
+    --line: #2A3454;
+    --file-bg: #1A2238;
+    --btn: #FFE27A;
+    --btn-ink: #10162A;
+    --ok-bg: #12463A;
+    --bad-bg: #4E1C1C;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --page: #10162A; --ink: #E3E9F5; --muted: #9AA7C2; --panel: #0A0F1F;
+  --panel-ink: #E6ECF8; --comment: #7F93B8; --line: #2A3454; --file-bg: #1A2238;
+  --btn: #FFE27A; --btn-ink: #10162A; --ok-bg: #12463A; --bad-bg: #4E1C1C;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: inherit; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  font-size: 1.125rem;
+  line-height: 1.5;
+}
+.wrap { max-width: 1280px; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
+header {
+  display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between;
+  gap: 1rem; border-bottom: 3px solid var(--ink); padding-bottom: 1rem; margin-bottom: 1.25rem;
+}
+h1 { margin: 0; font-size: clamp(1.8rem, 4vw, 2.8rem); line-height: 1.1; letter-spacing: -0.01em; }
+h1 code { font-family: "JetBrains Mono", Consolas, monospace; font-weight: 600; font-size: 0.85em; }
+.score { font-size: 1.25rem; color: var(--muted); }
+.score strong { color: var(--ink); font-size: 1.6rem; }
+nav.tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.25rem; }
+nav.tabs button {
+  font: inherit; font-weight: 700; cursor: pointer;
+  border: 2px solid var(--ink); background: transparent; color: var(--ink);
+  padding: 0.45rem 1rem; border-radius: 999px;
+}
+nav.tabs button[aria-selected="true"] { background: var(--ink); color: var(--page); }
+nav.tabs button.done::after { content: " ✓"; color: var(--ok); }
+nav.tabs button[aria-selected="true"].done::after { color: var(--ok-bg); }
+.drill-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.5rem 1.5rem; }
+h2 { margin: 0 0 0.25rem; font-size: 1.6rem; }
+.style-tag { color: var(--muted); margin: 0 0 1rem; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
+@media (min-width: 1000px) { .grid { grid-template-columns: minmax(0, 1fr) 280px; } }
+.code {
+  background: var(--panel); color: var(--panel-ink);
+  border-radius: 10px; padding: 1.25rem 1.25rem; overflow-x: auto;
+  font-family: "JetBrains Mono", Consolas, "Courier New", monospace;
+  font-size: var(--code-size); line-height: 1.75; white-space: pre; tab-size: 4;
+}
+.code .cm { color: var(--comment); }
+.code .kw { color: var(--kw); }
+.blank {
+  font: inherit; font-size: inherit; color: var(--field-ink); background: var(--field);
+  border: 0; border-bottom: 3px solid #C9A400; border-radius: 4px;
+  padding: 0 0.25em; margin: 0; min-width: 3ch; line-height: 1.3;
+}
+.blank:focus { outline: 3px solid var(--kw); outline-offset: 2px; }
+.blank.ok { background: var(--ok-bg); border-bottom-color: var(--ok); color: var(--ink); }
+.blank.bad { background: var(--bad-bg); border-bottom-color: var(--bad); color: var(--ink); }
+.num { color: var(--field); font-weight: 600; }
+aside.file {
+  background: var(--file-bg); border: 2px solid var(--line); border-radius: 10px; padding: 1rem;
+  align-self: start;
+}
+aside.file h3 { margin: 0 0 0.5rem; font-size: 1.05rem; }
+aside.file h3 code { font-family: "JetBrains Mono", monospace; }
+aside.file pre {
+  margin: 0; font-family: "JetBrains Mono", Consolas, monospace; font-size: 1.05rem; line-height: 1.6;
+  overflow-x: auto;
+}
+aside.file p { margin: 0.75rem 0 0; color: var(--muted); font-size: 1rem; }
+.controls { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-top: 1.25rem; }
+.controls button {
+  font: inherit; font-weight: 700; cursor: pointer; border-radius: 8px; padding: 0.6rem 1.2rem;
+  border: 2px solid var(--btn); background: var(--btn); color: var(--btn-ink);
+}
+.controls button.ghost { background: transparent; color: var(--ink); border-color: var(--ink); }
+.controls button:focus-visible, nav.tabs button:focus-visible, .size button:focus-visible { outline: 3px solid var(--kw); outline-offset: 2px; }
+.result { font-weight: 700; font-size: 1.2rem; min-height: 1.5em; }
+.result.ok { color: var(--ok); }
+.result.bad { color: var(--bad); }
+.size { display: flex; gap: 0.4rem; align-items: center; color: var(--muted); }
+.size button {
+  font: inherit; font-weight: 700; cursor: pointer; width: 2.6rem; height: 2.6rem;
+  border: 2px solid var(--ink); background: transparent; color: var(--ink); border-radius: 8px;
+}
+.hints { margin-top: 1rem; color: var(--muted); font-size: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Reading files with <code>File</code> &amp; <code>Scanner</code></h1>
+    <div class="score">Total: <strong id="total">0</strong> / <span id="max">0</span> blanks</div>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+
+  <section id="drill">
+    <div class="drill-head">
+      <div>
+        <h2 id="title"></h2>
+        <p class="style-tag" id="style"></p>
+      </div>
+      <div class="size" aria-label="Code text size">
+        Text size
+        <button id="smaller" aria-label="Smaller code text">A−</button>
+        <button id="bigger" aria-label="Larger code text">A+</button>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="code" id="code"></div>
+      <aside class="file">
+        <h3 id="fileName"></h3>
+        <pre id="fileBody"></pre>
+        <p id="fileNote"></p>
+      </aside>
+    </div>
+    <div class="controls">
+      <button id="check">Check answers</button>
+      <button id="reveal" class="ghost">Show answers</button>
+      <button id="reset" class="ghost">Clear</button>
+      <span class="result" id="result" role="status"></span>
+    </div>
+    <p class="hints">Answers are case-sensitive, just like Java. Press Enter to jump to the next blank.</p>
+  </section>
+</div>
+
+<script>
+// Blanks: {{answer}} or {{answer|alternate}}
+const drills = [
+  {
+    title: "Drill 1: loadScores",
+    style: "try / catch inside the method",
+    file: "scores.txt",
+    body: "Ana#92\nBen#85\nCruz#78\nDee#99",
+    note: "Each line is name#score.",
+    code:
+`public static void loadScores(String fileName, String[] players, int[] scores) {
+    {{try}} {                                              // 1. Start error handling
+        Scanner sc = new Scanner(new {{File}}(fileName));   // 2. Open file object
+        int i = 0;
+        while (sc.{{hasNextLine}}() && i < players.length) {   // 3. Check for next line
+            String line = sc.nextLine();
+            int hash = line.{{indexOf}}("#");                // 4. Find delimiter position
+            players[i] = line.substring(0, hash);
+            scores[i] = Integer.{{parseInt}}(line.substring(hash + 1)); // 5. Convert to int
+            i++;
+        }
+        sc.close();
+    } catch ({{FileNotFoundException}} e) {                              // 6. Catch file error
+        System.out.println("File read error");
+    }
+}`
+  },
+  {
+    title: "Drill 2: countLines",
+    style: "throws in the method header",
+    file: "roster.txt",
+    body: "Ana\nBen\nCruz\nDee\nEli",
+    note: "countLines(\"roster.txt\") returns 5.",
+    code:
+`import java.io.File;
+import java.io.{{FileNotFoundException}};       // 1. Import the checked exception
+import java.util.Scanner;
+
+public static int countLines(String fileName) {{throws}} FileNotFoundException {   // 2. Pass error to caller
+    File f = new File(fileName);
+    Scanner sc = new Scanner({{f}});              // 3. Connect Scanner to the File
+    int count = 0;
+    while (sc.{{hasNextLine}}()) {                 // 4. Check for another line
+        sc.{{nextLine}}();                         // 5. Read (skip) the line
+        count++;
+    }
+    sc.{{close}}();                                // 6. Release the file
+    return count;
+}`
+  },
+  {
+    title: "Drill 3: averageFromFile",
+    style: "try / catch inside the method",
+    file: "temps.txt",
+    body: "72 68 75\n80 77",
+    note: "Whitespace-separated ints. Average = 74.4",
+    code:
+`public static double averageFromFile(String fileName) {
+    int sum = 0;
+    int count = 0;
+    try {
+        File f = {{new}} File(fileName);            // 1. Create the File object
+        Scanner sc = new {{Scanner}}(f);            // 2. Build the reader
+        while (sc.{{hasNextInt}}()) {               // 3. Check for another int
+            sum += sc.{{nextInt}}();                // 4. Read the int
+            count++;
+        }
+        sc.close();
+    } {{catch}} (FileNotFoundException e) {         // 5. Begin the error handler
+        System.out.println("Error: " + e.{{getMessage}}());   // 6. Exception's message
+    }
+    if (count == 0) {
+        return 0;
+    }
+    return (double) sum / {{count}};               // 7. Divide by how many were read
+}`
+  },
+  {
+    title: "Drill 4: topStudent",
+    style: "throws in the method header",
+    file: "gpas.txt",
+    body: "Ana,3.8\nBen,3.2\nCruz,3.95\nDee,3.6",
+    note: "Each line is name,gpa. Returns \"Cruz\".",
+    code:
+`public static String topStudent(String fileName) {{throws}} {{FileNotFoundException}} {   // 1–2. Declare the error
+    Scanner sc = new Scanner(new File(fileName));
+    String best = "";
+    double bestGpa = -1;
+    while (sc.hasNextLine()) {
+        String[] parts = sc.nextLine().{{split}}(",");      // 3. Break line on commas
+        double gpa = Double.{{parseDouble}}(parts[{{1}}]);    // 4. Text to double  5. GPA field index
+        if (gpa > bestGpa) {
+            bestGpa = gpa;
+            best = parts[{{0}}];                             // 6. Name field index
+        }
+    }
+    sc.close();
+    return best;
+}`
+  },
+  {
+    title: "Drill 5: containsWord + main",
+    style: "throws in the helper, try / catch in the caller",
+    file: "story.txt",
+    body: "Once upon a time\na Dragon slept\nunder the hill.",
+    note: "containsWord(\"story.txt\", \"dragon\") returns true.",
+    code:
+`public static boolean containsWord(String fileName, String target) throws FileNotFoundException {
+    Scanner sc = new Scanner(new File(fileName));
+    while (sc.{{hasNext}}()) {                        // 1. Check for another word (token)
+        String word = sc.{{next}}();                  // 2. Read one word
+        if (word.{{equalsIgnoreCase}}(target)) {      // 3. Compare, ignoring case
+            sc.close();
+            return {{true}};                          // 4. Found it
+        }
+    }
+    sc.close();
+    return false;
+}
+
+public static void main(String[] args) {
+    {{try}} {                                         // 5. Caller must handle the error
+        System.out.println(containsWord("story.txt", "dragon"));
+    } catch ({{FileNotFoundException}} e) {           // 6. Same exception the helper throws
+        System.out.println("story.txt not found");
+    }
+}`
+  }
+];
+
+const keywords = /\b(public|static|void|int|double|boolean|String|new|while|if|return|try|catch|throws|import|false|true)\b/g;
+const state = drills.map(() => ({ values: [], checked: false, correct: 0 }));
+let current = 0;
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+function colorPlain(s) {
+  // s is already escaped; split off comment
+  const idx = s.indexOf("//");
+  let codePart = idx >= 0 ? s.slice(0, idx) : s;
+  let cm = idx >= 0 ? s.slice(idx) : "";
+  // avoid coloring inside string literals
+  codePart = codePart.split(/(&quot;|"[^"]*")/).map(chunk =>
+    chunk.startsWith('"') ? chunk : chunk.replace(keywords, '<span class="kw">$1</span>')
+  ).join("");
+  cm = cm.replace(/(\d+(–\d+)?\.)/, '<span class="num">$1</span>');
+  return codePart + (cm ? '<span class="cm">' + cm + '</span>' : "");
+}
+
+function parseDrill(d) {
+  const blanks = [];
+  const lines = d.code.split("\n").map(line => {
+    let out = "";
+    let last = 0;
+    const re = /\{\{(.+?)\}\}/g;
+    let m;
+    const pieces = [];
+    while ((m = re.exec(line))) {
+      pieces.push({ text: line.slice(last, m.index) });
+      pieces.push({ blank: m[1].split("|") });
+      last = m.index + m[0].length;
+    }
+    pieces.push({ text: line.slice(last) });
+    // color: comment only appears in final text piece
+    pieces.forEach(p => {
+      if (p.text !== undefined) {
+        const t = esc(p.text);
+        const ci = t.indexOf("//");
+        if (ci >= 0) {
+          out += colorPlain(t);
+        } else {
+          out += t.split(/("[^"]*")/).map(c => c.startsWith('"') ? c : c.replace(keywords, '<span class="kw">$1</span>')).join("");
+        }
+      } else {
+        const i = blanks.length;
+        blanks.push(p.blank);
+        const w = Math.max(p.blank[0].length, 3) + 1;
+        out += `<input class="blank" data-i="${i}" style="width:${w}ch" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Blank ${i + 1}">`;
+      }
+    });
+    return out;
+  });
+  return { html: lines.join("\n"), blanks };
+}
+
+const parsed = drills.map(parseDrill);
+document.getElementById("max").textContent = parsed.reduce((n, p) => n + p.blanks.length, 0);
+
+const tabs = document.getElementById("tabs");
+drills.forEach((d, i) => {
+  const b = document.createElement("button");
+  b.setAttribute("role", "tab");
+  b.textContent = "Drill " + (i + 1);
+  b.addEventListener("click", () => show(i));
+  tabs.appendChild(b);
+});
+
+function saveValues() {
+  state[current].values = [...document.querySelectorAll("#code .blank")].map(x => x.value);
+}
+
+function show(i) {
+  if (document.querySelector("#code .blank")) saveValues();
+  current = i;
+  const d = drills[i], p = parsed[i];
+  [...tabs.children].forEach((b, j) => b.setAttribute("aria-selected", j === i ? "true" : "false"));
+  document.getElementById("title").textContent = d.title;
+  document.getElementById("style").textContent = d.style;
+  document.getElementById("fileName").innerHTML = "<code>" + esc(d.file) + "</code>";
+  document.getElementById("fileBody").textContent = d.body;
+  document.getElementById("fileNote").textContent = d.note;
+  const code = document.getElementById("code");
+  code.innerHTML = p.html;
+  const inputs = [...code.querySelectorAll(".blank")];
+  inputs.forEach((inp, k) => {
+    inp.value = state[i].values[k] || "";
+    inp.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (k + 1 < inputs.length) inputs[k + 1].focus();
+        else check();
+      }
+    });
+    inp.addEventListener("input", () => inp.classList.remove("ok", "bad"));
+  });
+  const r = document.getElementById("result");
+  r.textContent = ""; r.className = "result";
+  if (state[i].checked) check(true);
+  if (location.hash !== "#drill-" + (i + 1)) history.replaceState(null, "", "#drill-" + (i + 1));
+}
+
+function check(silent) {
+  const p = parsed[current];
+  const inputs = [...document.querySelectorAll("#code .blank")];
+  let ok = 0;
+  inputs.forEach((inp, k) => {
+    const v = inp.value.trim();
+    const good = p.blanks[k].includes(v);
+    inp.classList.toggle("ok", good);
+    inp.classList.toggle("bad", !good);
+    if (good) ok++;
+  });
+  state[current].checked = true;
+  state[current].correct = state[current].revealed ? 0 : ok;
+  saveValues();
+  const r = document.getElementById("result");
+  r.textContent = ok === inputs.length ? `All ${ok} correct.` : `${ok} of ${inputs.length} correct. Fix the red blanks.`;
+  r.className = "result " + (ok === inputs.length ? "ok" : "bad");
+  tabs.children[current].classList.toggle("done", ok === inputs.length && !state[current].revealed);
+  updateTotal();
+}
+
+function updateTotal() {
+  document.getElementById("total").textContent = state.reduce((n, s) => n + s.correct, 0);
+}
+
+document.getElementById("check").addEventListener("click", () => check());
+document.getElementById("reveal").addEventListener("click", () => {
+  const p = parsed[current];
+  document.querySelectorAll("#code .blank").forEach((inp, k) => { inp.value = p.blanks[k][0]; });
+  state[current].revealed = true; // revealed answers don't count
+  check();
+  document.getElementById("result").textContent = "Answers shown (not counted).";
+  document.getElementById("result").className = "result";
+});
+document.getElementById("reset").addEventListener("click", () => {
+  state[current] = { values: [], checked: false, correct: 0, revealed: false };
+  tabs.children[current].classList.remove("done");
+  document.querySelectorAll("#code .blank").forEach(inp => inp.value = "");
+  show(current);
+  updateTotal();
+});
+
+let size = 20;
+function setSize(n) {
+  size = Math.min(34, Math.max(14, n));
+  document.documentElement.style.setProperty("--code-size", size + "px");
+  try { localStorage.setItem("codeSize", size); } catch (e) {}
+}
+try { const s = parseInt(localStorage.getItem("codeSize")); if (s) setSize(s); } catch (e) {}
+document.getElementById("smaller").addEventListener("click", () => setSize(size - 2));
+document.getElementById("bigger").addEventListener("click", () => setSize(size + 2));
+
+function fromHash() {
+  const m = location.hash.match(/^#drill-([1-5])$/);
+  return m ? parseInt(m[1]) - 1 : 0;
+}
+window.addEventListener("hashchange", () => { const i = fromHash(); if (i !== current) show(i); });
+show(fromHash());
+</script>
+</body>
+</html>
