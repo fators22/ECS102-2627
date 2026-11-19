@@ -1,0 +1,18 @@
+Student1 178
+Student2 189
+Student3 254
+Student4 328
+Student5 349
+Student6 82
+Student7 164
+Student9 101
+Student10 246
+Student11 2
+Student12 146
+Student13 119
+Student14 319
+Student15 213
+Student16 255
+Student17 295
+Student18 63
+

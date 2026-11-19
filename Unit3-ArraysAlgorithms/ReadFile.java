@@ -19,6 +19,12 @@ public class ReadFile {
         input.close();
 
     }
+    //TODO find youngest
+    //TODO find oldest
+    //TODO find average
+    //TODO find duplicates
+
+
     public static void main(String[] args) {
         try{
         ReadFile r= new ReadFile("names.txt");
